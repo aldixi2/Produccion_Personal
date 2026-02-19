@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>USPP Chupaca | Producción</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+  :root{
+    --bg:#070b18;
+    --card: rgba(255,255,255,.92);
+    --card2: rgba(255,255,255,.86);
+    --text:#0f172a;
+    --muted:#6b7280;
+    --border: rgba(148,163,184,.35);
+    --shadow: 0 18px 50px rgba(0,0,0,.30);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 10% 0%, rgba(79,70,229,.25), transparent 60%),
+      radial-gradient(900px 500px at 90% 10%, rgba(6,182,212,.20), transparent 60%),
+      linear-gradient(180deg, #070b18, #0b1430);
+    overflow-x:hidden;
+  }
+  #fx{position:fixed; inset:0; z-index:-1;}
+
+  header{
+    position:sticky; top:0; z-index:5;
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(226,232,240,.9);
+    padding:14px 18px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .brand{display:flex; gap:10px; align-items:center}
+  .brand img{height:46px; object-fit:contain}
+  h1{margin:0;font-size:18px}
+  .badge{
+    display:inline-block; padding:2px 10px;
+    border:1px solid rgba(226,232,240,.9);
+    border-radius:999px; background:#fff; font-size:12px; color:#111827;
+  }
+
+  .wrap{max-width:1550px;margin:0 auto;padding:12px 0 26px}
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    padding:12px;
+    margin:12px 18px;
+  }
+  .card.soft{background:var(--card2)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  label{font-size:12px;color:#111827}
+  select,input,button{
+    padding:10px 10px;
+    border:1px solid rgba(203,213,225,.95);
+    border-radius:14px;
+    background:#fff;
+    outline:none;
+  }
+  button{cursor:pointer}
+  button:hover{transform:translateY(-1px)}
+  .muted{color:var(--muted);font-size:12px;line-height:1.35}
+
+  table{border-collapse:collapse;width:100%;font-size:12px;background:#fff;border-radius:14px;overflow:hidden}
+  th,td{border:1px solid #e5e7eb;padding:4px 6px;text-align:center;white-space:nowrap}
+  th{background:#f3f4f6;position:sticky;top:0}
+  .left{text-align:left}
+  .scroll{overflow:auto;max-height:560px;border-radius:14px}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{
+    padding:8px 12px;border:1px solid rgba(203,213,225,.95);
+    border-radius:999px;background:#fff;cursor:pointer;font-size:13px;
+  }
+  .tab.active{background:rgba(79,70,229,.10);border-color:rgba(79,70,229,.35);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+  .chartbox{border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#fff}
+  .chartbox canvas{height:210px !important; max-height:210px !important;}
+  @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+
+  #printHeader,#printFooter{display:none}
+  @media print{
+    header,.no-print{display:none !important}
+    #fx{display:none}
+    .card{margin:0 0 10px 0; box-shadow:none; background:#fff; border:0}
+    .scroll{max-height:none;overflow:visible;border:0}
+    #printHeader{display:flex !important; gap:12px; align-items:center; margin-bottom:10px}
+    #printHeader img{height:55px}
+    #printTitle{margin:0;font-size:18px;font-weight:800}
+    #printSub{font-size:12px;color:#374151;margin-top:3px}
+    #printFooter{display:block !important;margin-top:10px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:11px;color:#374151;text-align:center}
+
+    /* ✅ IMPRESIÓN PRO: mostramos imágenes (de los gráficos anuales) en vez de canvas */
+    #img_c_anio_mes, #img_c_years_total{ display:block !important; }
+    #c_anio_mes, #c_years_total{ display:none !important; }
+  }
+</style>
+</head>
+
+<body>
+<canvas id="fx"></canvas>
+
+<header>
+  <div class="brand">
+    <img src="logo.png" alt="USPP Chupaca" onerror="this.style.display='none'">
+    <div>
+      <h1>Dashboard de Producción — USPP Chupaca</h1>
+      <span class="badge" id="estado">Cargando…</span>
+    </div>
+  </div>
+  <div class="row">
+    <button onclick="window.print()">🖨️ Imprimir reporte</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card" id="printHeader">
+    <img src="logo.png" alt="USPP Chupaca" onerror="this.style.display='none'">
+    <div>
+      <p id="printTitle">PRODUCCIÓN DEL PERSONAL DE SALUD</p>
+      <div id="printSub"></div>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <b>Filtros inteligentes (cascada)</b>
+    <div class="muted" style="margin-top:6px">
+      DNI usado = <b>DNI Resp. Aten.</b> (profesional). No se cruza con DNI del paciente.
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Año</label><br><select id="anio"></select>
+      </div>
+      <div>
+        <label>Mes</label><br><select id="mes"></select>
+      </div>
+      <div style="min-width:260px;flex:1">
+        <label>Establecimiento (EESS)</label><br><select id="estab"><option value="">Todos</option></select>
+      </div>
+      <div style="min-width:220px;flex:1">
+        <label>Tipo profesional</label><br><select id="tipo"><option value="">Todos</option></select>
+      </div>
+      <div>
+        <label>DNI del profesional</label><br>
+        <select id="dni" style="width:180px"><option value="">Todos</option></select>
+      </div>
+      <div style="min-width:260px;flex:1">
+        <label>Nombre del profesional</label><br><select id="prof"><option value="">Todos</option></select>
+      </div>
+      <div style="min-width:240px;flex:1">
+        <label>Prestación (opcional)</label><br>
+        <input id="prest" placeholder="Buscar servicio o ID (ej: 56 o obstetricia)" style="width:100%">
+      </div>
+      <div>
+        <label>Modo matriz personal</label><br>
+        <select id="modo" style="width:190px">
+          <option value="auto" selected>Auto (recomendado)</option>
+          <option value="por_dni">Por DNI (detalle)</option>
+          <option value="resumen">Resumen (1 fila)</option>
+        </select>
+      </div>
+
+      <button id="btn">Aplicar</button>
+      <button id="btnReset">Limpiar</button>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <b>Gráficos (vista general)</b>
+    <div class="grid">
+      <div class="chartbox">
+        <div style="font-weight:600;margin-bottom:6px">Top 15 EESS (por registros)</div>
+        <canvas id="c_eess"></canvas>
+      </div>
+      <div class="chartbox">
+        <div style="font-weight:600;margin-bottom:6px">Distribución por Tipo Profesional</div>
+        <canvas id="c_tipo"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ NUEVO: REPORTE ANUAL IMPRIMIBLE -->
+  <div class="card">
+    <b>Reporte anual (imprimible)</b>
+    <div class="muted" style="margin-top:6px">
+      Total anual y producción por mes del año seleccionado + comparativo total por año.
+    </div>
+
+    <div class="row" style="margin-top:10px;align-items:center">
+      <div class="badge" id="kpiAnual">Total anual: —</div>
+      <button class="no-print" id="btnCargarAnio" style="margin-left:auto">📅 Cargar año</button>
+    </div>
+
+    <div class="grid" style="margin-top:10px">
+      <div class="chartbox">
+        <div style="font-weight:600;margin-bottom:6px">Producción por mes (Año seleccionado)</div>
+        <canvas id="c_anio_mes"></canvas>
+        <img id="img_c_anio_mes" style="display:none;width:100%;max-height:260px;object-fit:contain" alt="">
+      </div>
+
+      <div class="chartbox">
+        <div style="font-weight:600;margin-bottom:6px">Total por año (comparativo)</div>
+        <canvas id="c_years_total"></canvas>
+        <img id="img_c_years_total" style="display:none;width:100%;max-height:260px;object-fit:contain" alt="">
+      </div>
+    </div>
+  </div>
+
+  <div class="card soft no-print">
+    <div class="tabs">
+      <div class="tab active" id="tabPersonal">Matriz del personal</div>
+      <div class="tab" id="tabEESS">Matriz por establecimiento</div>
+    </div>
+  </div>
+
+  <div class="card" id="cardPersonal">
+    <b>Matriz del personal (EESS + Personal + DNI + días)</b>
+    <div class="scroll" style="margin-top:10px"><table id="matrizPersonal"></table></div>
+  </div>
+
+  <div class="card" id="cardEESS" style="display:none">
+    <b>Matriz por establecimiento (EESS x días)</b>
+    <div class="scroll" style="margin-top:10px"><table id="matrizEESS"></table></div>
+  </div>
+
+  <div class="card" id="printFooter">
+    Sistema creado por Junior Aldair Illesca Medina - USPP
+  </div>
+</div>
+
+<script>
+(function particles(){
+  const c = document.getElementById("fx");
+  const ctx = c.getContext("2d");
+  let w,h,pts=[];
+  function resize(){
+    w = c.width = window.innerWidth * devicePixelRatio;
+    h = c.height = window.innerHeight * devicePixelRatio;
+    c.style.width = window.innerWidth+"px";
+    c.style.height = window.innerHeight+"px";
+    pts = Array.from({length: 80}, ()=>( {
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-.5)*0.25*devicePixelRatio,
+      vy: (Math.random()-.5)*0.25*devicePixelRatio,
+      r: (Math.random()*1.8 + .8)*devicePixelRatio
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of pts){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0||p.x>w) p.vx*=-1;
+      if(p.y<0||p.y>h) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.fill();
+    }
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const a=pts[i], b=pts[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d < 140*devicePixelRatio){
+          ctx.strokeStyle = `rgba(255,255,255,${0.10*(1-d/(140*devicePixelRatio))})`;
+          ctx.lineWidth = 1*devicePixelRatio;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener("resize", resize);
+  resize(); draw();
+})();
+
+let BASE = [];
+let MANIFEST = null;
+
+let chartEESS=null, chartTipo=null;
+
+// ✅ nuevos charts
+let chartAnioMes=null, chartYearsTotal=null;
+
+// caches
+const YEAR_CACHE = new Map();      // año seleccionado -> {mes: total}
+const YEARS_TOTAL_CACHE = new Map(); // año -> total anual (general)
+
+const $ = (id)=>document.getElementById(id);
+const MONTHS = [
+  {n:1, t:"Enero"},{n:2,t:"Febrero"},{n:3,t:"Marzo"},{n:4,t:"Abril"},
+  {n:5,t:"Mayo"},{n:6,t:"Junio"},{n:7,t:"Julio"},{n:8,t:"Agosto"},
+  {n:9,t:"Septiembre"},{n:10,t:"Octubre"},{n:11,t:"Noviembre"},{n:12,t:"Diciembre"}
+];
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function unesc(s){ return String(s).replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m => ({'&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'" }[m])); }
+function canonDNI(v){ return String(v ?? "").replace(/\D/g,""); }
+function diasEnMes(anio, mes){ return new Date(Number(anio), Number(mes), 0).getDate(); }
+
+$("btn").onclick = ()=>render();
+$("btnReset").onclick = ()=>{
+  $("estab").value=""; $("tipo").value=""; $("dni").value=""; $("prof").value="";
+  $("prest").value=""; $("modo").value="auto";
+  refreshCascada(); render();
+};
+
+$("tabPersonal").onclick = ()=>{
+  $("tabPersonal").classList.add("active");
+  $("tabEESS").classList.remove("active");
+  $("cardPersonal").style.display="";
+  $("cardEESS").style.display="none";
+};
+$("tabEESS").onclick = ()=>{
+  $("tabEESS").classList.add("active");
+  $("tabPersonal").classList.remove("active");
+  $("cardEESS").style.display="";
+  $("cardPersonal").style.display="none";
+};
+
+["estab","tipo","dni","prof","modo"].forEach(id=>{
+  $(id).addEventListener("change", ()=>{ refreshCascada(); render(); });
+});
+$("prest").addEventListener("input", ()=>render());
+
+$("btnCargarAnio").onclick = async ()=>{
+  await cargarAnio(true);
+  await cargarTotalesPorAnios(true);
+  renderAnual();
+  renderTotalesPorAnios();
+};
+
+async function cargarManifestYAuto(){
+  const r = await fetch("data/manifest.json?ts="+Date.now());
+  const m = await r.json();
+  MANIFEST = m;
+
+  const years = [...new Set(m.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
+  $("anio").innerHTML = years.map(y=>`<option value="${y}">${y}</option>`).join("");
+
+  const fillMes = ()=>{
+    const y = Number($("anio").value);
+    const ms = m.disponibles.filter(x=>x.anio===y).map(x=>x.mes).sort((a,b)=>a-b);
+    $("mes").innerHTML = ms.map(mm=>{
+      const name = MONTHS.find(k=>k.n===mm)?.t || mm;
+      return `<option value="${mm}">${name}</option>`;
+    }).join("");
+  };
+
+  $("anio").addEventListener("change", async ()=>{
+    fillMes();
+    await cargarMes();
+    refreshCascada();
+    render();
+
+    await cargarAnio(true);
+    await cargarTotalesPorAnios(true);
+    renderAnual();
+    renderTotalesPorAnios();
+  });
+
+  $("mes").addEventListener("change", async ()=>{
+    await cargarMes();
+    refreshCascada();
+    render();
+  });
+
+  $("anio").value = m.ultimo.anio;
+  fillMes();
+  $("mes").value = m.ultimo.mes;
+
+  await cargarMes();
+  refreshCascada();
+  render();
+
+  // ✅ carga anual + totales por año al inicio
+  await cargarAnio();
+  await cargarTotalesPorAnios();
+  renderAnual();
+  renderTotalesPorAnios();
+}
+
+async function cargarMes(){
+  const anio = $("anio").value;
+  const mes  = $("mes").value;
+  const file = `data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
+
+  $("estado").textContent = `Cargando ${anio}-${String(mes).padStart(2,"0")}…`;
+  const r = await fetch(file + "?ts=" + Date.now());
+  BASE = await r.json();
+
+  for(const x of BASE){
+    x.dni_prof = canonDNI(x.dni_prof);
+  }
+  $("estado").textContent = `Base lista: ${BASE.length} registros (${anio}-${String(mes).padStart(2,"0")})`;
+}
+
+/* =========================
+   ✅ CARGA ANUAL (por mes del año seleccionado)
+========================= */
+async function cargarAnio(forzar=false){
+  if(!MANIFEST) return;
+
+  const anio = Number($("anio").value);
+  if(!forzar && YEAR_CACHE.has(anio)) return;
+
+  $("estado").textContent = `Cargando año ${anio} (sumando meses)…`;
+
+  const meses = MANIFEST.disponibles
+    .filter(x=>x.anio===anio)
+    .map(x=>x.mes)
+    .sort((a,b)=>a-b);
+
+  const totPorMes = {};
+  for(const mes of meses){
+    const file = `data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
+    try{
+      const r = await fetch(file + "?ts=" + Date.now());
+      const data = await r.json();
+      totPorMes[mes] = Array.isArray(data) ? data.length : 0;
+    }catch(e){
+      totPorMes[mes] = 0;
+    }
+  }
+
+  YEAR_CACHE.set(anio, totPorMes);
+  $("estado").textContent = `Año ${anio} cargado (meses: ${meses.length})`;
+}
+
+function renderAnual(){
+  const anio = Number($("anio").value);
+  const totPorMes = YEAR_CACHE.get(anio) || {};
+
+  const labels = MONTHS.map(m=>m.t);
+  const dataMes = MONTHS.map(m=> Number(totPorMes[m.n] || 0));
+
+  const totalAnual = dataMes.reduce((a,b)=>a+b,0);
+  $("kpiAnual").textContent = `Total anual ${anio}: ${totalAnual.toLocaleString()}`;
+
+  if(chartAnioMes) chartAnioMes.destroy();
+  chartAnioMes = new Chart($("c_anio_mes"), {
+    type:"bar",
+    data:{ labels, datasets:[{ label:"Registros", data:dataMes }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+  });
+}
+
+/* =========================
+   ✅ NUEVO: TOTALES POR AÑO (2023, 2024, 2025…)
+   Usa los años disponibles en manifest.json
+========================= */
+async function cargarTotalesPorAnios(forzar=false){
+  if(!MANIFEST) return;
+
+  const years = [...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
+
+  // si ya está cargado y no forzamos, salimos
+  if(!forzar){
+    let ok = true;
+    for(const y of years){ if(!YEARS_TOTAL_CACHE.has(y)) { ok=false; break; } }
+    if(ok) return;
+  }
+
+  $("estado").textContent = `Cargando totales por año…`;
+
+  // Para cada año, sumamos la longitud de sus meses disponibles
+  for(const y of years){
+    if(!forzar && YEARS_TOTAL_CACHE.has(y)) continue;
+
+    const meses = MANIFEST.disponibles
+      .filter(x=>x.anio===y)
+      .map(x=>x.mes)
+      .sort((a,b)=>a-b);
+
+    let total = 0;
+    for(const mes of meses){
+      const file = `data/base_${y}_${String(mes).padStart(2,"0")}.json`;
+      try{
+        const r = await fetch(file + "?ts=" + Date.now());
+        const data = await r.json();
+        total += Array.isArray(data) ? data.length : 0;
+      }catch(e){
+        // si falta un archivo, simplemente no suma
+      }
+    }
+
+    YEARS_TOTAL_CACHE.set(y, total);
+  }
+
+  $("estado").textContent = `Totales por año listos`;
+}
+
+function renderTotalesPorAnios(){
+  if(!MANIFEST) return;
+
+  const years = [...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
+  const labels = years.map(String);
+  const data = years.map(y => Number(YEARS_TOTAL_CACHE.get(y) || 0));
+
+  if(chartYearsTotal) chartYearsTotal.destroy();
+
+  chartYearsTotal = new Chart($("c_years_total"), {
+    type:"bar",
+    data:{ labels, datasets:[{ label:"Total anual", data }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+  });
+}
+
+function refreshCascada(){
+  const estabSel = unesc($("estab").value);
+  const tipoSel  = unesc($("tipo").value);
+  const dniSel   = unesc($("dni").value);
+  const profSel  = unesc($("prof").value);
+
+  let d = BASE;
+  if(estabSel) d = d.filter(x=>x.establecimiento===estabSel);
+  if(tipoSel)  d = d.filter(x=>x.tipo_profesional===tipoSel);
+
+  let dDNI = d;
+  if(profSel) dDNI = dDNI.filter(x=>x.profesional===profSel);
+  const dnis = [...new Set(dDNI.map(x=>x.dni_prof).filter(Boolean))].sort();
+
+  let dPROF = d;
+  if(dniSel) dPROF = dPROF.filter(x=>x.dni_prof===dniSel);
+  const profCounts = new Map();
+  for(const x of dPROF){
+    const p = x.profesional || "";
+    if(!p) continue;
+    profCounts.set(p, (profCounts.get(p)||0)+1);
+  }
+  const profs = [...profCounts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,200).map(x=>x[0]);
+
+  const estabs = [...new Set(d.map(x=>x.establecimiento).filter(Boolean))].sort();
+  const tipos  = [...new Set(d.map(x=>x.tipo_profesional).filter(Boolean))].sort();
+
+  $("estab").innerHTML = `<option value="">Todos</option>` + estabs.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join("");
+  $("tipo").innerHTML  = `<option value="">Todos</option>` + tipos.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");
+  $("dni").innerHTML   = `<option value="">Todos</option>` + dnis.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  $("prof").innerHTML  = `<option value="">Todos</option>` + profs.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
+
+  if(estabSel) $("estab").value = esc(estabSel);
+  if(tipoSel)  $("tipo").value  = esc(tipoSel);
+  if(dniSel)   $("dni").value   = esc(dniSel);
+  if(profSel)  $("prof").value  = esc(profSel);
+}
+
+function filtrosTexto(){
+  const anio = $("anio").value;
+  const mes  = $("mes").value;
+  const mesName = MONTHS.find(x=>String(x.n)===String(mes))?.t || mes;
+  const estab = $("estab").value ? `EESS: ${unesc($("estab").value)}` : "EESS: Todos";
+  const tipo  = $("tipo").value ? `Tipo: ${unesc($("tipo").value)}` : "Tipo: Todos";
+  const dni   = $("dni").value ? `DNI: ${unesc($("dni").value)}` : "DNI: -";
+  const prof  = $("prof").value ? `Profesional: ${unesc($("prof").value)}` : "Profesional: Todos";
+  const prest = $("prest").value.trim() ? `Prestación: ${$("prest").value.trim()}` : "Prestación: -";
+  return `Periodo: ${anio} - ${mesName} | ${estab} | ${tipo} | ${dni} | ${prof} | ${prest}`;
+}
+
+function aplicarFiltros(){
+  const estab = unesc($("estab").value);
+  const tipo  = unesc($("tipo").value);
+  const dni   = unesc($("dni").value);
+  const prof  = unesc($("prof").value);
+  const prest = $("prest").value.trim().toLowerCase();
+
+  let d = BASE;
+  if(estab) d = d.filter(x=>x.establecimiento===estab);
+  if(tipo)  d = d.filter(x=>x.tipo_profesional===tipo);
+  if(dni)   d = d.filter(x=>x.dni_prof===dni);
+  if(prof)  d = d.filter(x=>x.profesional===prof);
+
+  if(prest){
+    d = d.filter(x=>{
+      const s = String(x.servicio||"").toLowerCase();
+      const id = String(x.id_servicio||"").toLowerCase();
+      return s.includes(prest) || id.includes(prest);
+    });
+  }
+  return d;
+}
+
+function render(){
+  if(!BASE.length) return;
+  $("printSub").textContent = filtrosTexto();
+
+  const d = aplicarFiltros();
+  const anio = $("anio").value;
+  const mes = $("mes").value;
+  const nDias = diasEnMes(anio, mes);
+
+  renderMatrizPersonal(d, nDias);
+  renderMatrizEESS(d, nDias);
+  renderCharts(d);
+}
+
+function renderMatrizPersonal(d, nDias){
+  const days = Array.from({length:nDias},(_,i)=>i+1);
+  const modo = $("modo").value;
+  const dniSel = unesc($("dni").value);
+  const profSel = unesc($("prof").value);
+
+  let keyMode = modo;
+  if(modo === "auto"){
+    if(dniSel) keyMode = "por_dni_resumen";
+    else if(profSel) keyMode = "resumen";
+    else keyMode = "por_dni";
+  }
+
+  const map = new Map();
+
+  function makeKey(r){
+    const e = r.establecimiento || "SIN EESS";
+    const p = r.profesional || "SIN PROFESIONAL";
+    const t = r.tipo_profesional || "SIN TIPO";
+    const dni = r.dni_prof || "";
+
+    if(keyMode === "resumen") return ["__ALL__", p, t].join("||");
+    if(keyMode === "por_dni_resumen") return ["__ALL__", p, t, dni].join("||");
+    return [e, p, t, dni].join("||");
+  }
+
+  for(const r of d){
+    const k = makeKey(r);
+    if(!map.has(k)){
+      map.set(k, {
+        establecimiento: (keyMode==="resumen"||keyMode==="por_dni_resumen") ? "TODOS" : (r.establecimiento||"SIN EESS"),
+        profesional: r.profesional||"SIN PROFESIONAL",
+        profesion: r.tipo_profesional||"SIN TIPO",
+        dni_prof: (keyMode==="resumen") ? "-" : (r.dni_prof||""),
+        d: Object.fromEntries(days.map(x=>[x,0])),
+        total:0
+      });
+    }
+    const obj = map.get(k);
+    const dia = Number(r.dia)||0;
+    if(dia>=1 && dia<=nDias){
+      obj.d[dia] += 1;
+      obj.total += 1;
+    }
+  }
+
+  const rows = [...map.values()].sort((a,b)=>b.total-a.total);
+
+  let html = `<tr>
+    <th class="left">ESTABLECIMIENTO</th>
+    <th class="left">PERSONAL</th>
+    <th class="left">PROFESIÓN</th>
+    <th>DNI</th>
+    ${days.map(x=>`<th>${x}</th>`).join("")}
+    <th>Total</th>
+  </tr>`;
+
+  for(const r of rows){
+    html += `<tr>
+      <td class="left">${esc(r.establecimiento)}</td>
+      <td class="left">${esc(r.profesional)}</td>
+      <td class="left">${esc(r.profesion)}</td>
+      <td>${esc(r.dni_prof)}</td>
+      ${days.map(dy=>`<td>${r.d[dy]||0}</td>`).join("")}
+      <td><b>${r.total}</b></td>
+    </tr>`;
+  }
+
+  $("matrizPersonal").innerHTML = html;
+}
+
+function renderMatrizEESS(d, nDias){
+  const days = Array.from({length:nDias},(_,i)=>i+1);
+  const map = new Map();
+
+  for(const r of d){
+    const k = r.establecimiento || "SIN EESS";
+    if(!map.has(k)) map.set(k, {d:Object.fromEntries(days.map(x=>[x,0])), total:0});
+    const obj = map.get(k);
+    const dia = Number(r.dia)||0;
+    if(dia>=1 && dia<=nDias){
+      obj.d[dia] += 1;
+      obj.total += 1;
+    }
+  }
+
+  const rows = [...map.entries()].map(([k,v])=>({k, ...v})).sort((a,b)=>b.total-a.total);
+
+  let html = `<tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th>Total</th></tr>`;
+  for(const r of rows){
+    html += `<tr>
+      <td class="left">${esc(r.k)}</td>
+      ${days.map(dy=>`<td>${r.d[dy]||0}</td>`).join("")}
+      <td><b>${r.total}</b></td>
+    </tr>`;
+  }
+  $("matrizEESS").innerHTML = html;
+}
+
+function renderCharts(d){
+  const eCount = new Map();
+  for(const x of d){
+    const k = x.establecimiento || "";
+    if(!k) continue;
+    eCount.set(k, (eCount.get(k)||0)+1);
+  }
+  const topE = [...eCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const eLabels = topE.map(x=>x[0]);
+  const eData   = topE.map(x=>x[1]);
+
+  const tCount = new Map();
+  for(const x of d){
+    const k = x.tipo_profesional || "SIN DATO";
+    tCount.set(k, (tCount.get(k)||0)+1);
+  }
+  const tArr = [...tCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const tLabels = tArr.map(x=>x[0]);
+  const tData   = tArr.map(x=>x[1]);
+
+  if(chartEESS) chartEESS.destroy();
+  if(chartTipo) chartTipo.destroy();
+
+  chartEESS = new Chart($("c_eess"), {
+    type:"bar",
+    data:{ labels:eLabels, datasets:[{ label:"Registros", data:eData }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+  });
+
+  chartTipo = new Chart($("c_tipo"), {
+    type:"doughnut",
+    data:{ labels:tLabels, datasets:[{ data:tData }] },
+    options:{ responsive:true, maintainAspectRatio:false }
+  });
+}
+
+/* ✅ Antes de imprimir: “foto” de los gráficos anuales para que salgan perfectos */
+function snapChartToImg(canvasId, imgId){
+  const c = document.getElementById(canvasId);
+  const img = document.getElementById(imgId);
+  if(!c || !img) return;
+  try{ img.src = c.toDataURL("image/png", 1.0); }catch(e){}
+}
+window.addEventListener("beforeprint", ()=>{
+  snapChartToImg("c_anio_mes","img_c_anio_mes");
+  snapChartToImg("c_years_total","img_c_years_total");
+});
+
+cargarManifestYAuto();
+</script>
+</body>
+</html>
