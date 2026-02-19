@@ -136,6 +136,7 @@
     <b>Filtros inteligentes (cascada)</b>
     <div class="muted" style="margin-top:6px">
       DNI usado = <b>DNI Resp. Aten.</b> (profesional). No se cruza con DNI del paciente.
+      <br><b style="color:#0f172a">Modo confidencial:</b> no se muestra DNI, solo iniciales + apellidos.
     </div>
 
     <div class="row" style="margin-top:10px">
@@ -151,22 +152,25 @@
       <div style="min-width:220px;flex:1">
         <label>Tipo profesional</label><br><select id="tipo"><option value="">Todos</option></select>
       </div>
-      <div>
-        <label>DNI del profesional</label><br>
-        <select id="dni" style="width:180px"><option value="">Todos</option></select>
+
+      <!-- ✅ CONFIDENCIAL: Buscador de profesional -->
+      <div style="min-width:320px;flex:1">
+        <label>Profesional (buscar por apellido o nombre)</label><br>
+        <input id="profSearch" placeholder="Escribe: illesca, carrillo, ana..." style="width:100%">
+        <div class="muted" style="margin-top:4px">Ejemplo: Junior Aldair Illesca Medina → <b>J. A. Illesca Medina</b></div>
+        <div id="profHits" class="muted" style="margin-top:4px"></div>
       </div>
-      <div style="min-width:260px;flex:1">
-        <label>Nombre del profesional</label><br><select id="prof"><option value="">Todos</option></select>
-      </div>
+
       <div style="min-width:240px;flex:1">
         <label>Prestación (opcional)</label><br>
         <input id="prest" placeholder="Buscar servicio o ID (ej: 56 o obstetricia)" style="width:100%">
       </div>
+
       <div>
         <label>Modo matriz personal</label><br>
         <select id="modo" style="width:190px">
           <option value="auto" selected>Auto (recomendado)</option>
-          <option value="por_dni">Por DNI (detalle)</option>
+          <option value="por_dni">Por profesional (detalle)</option>
           <option value="resumen">Resumen (1 fila)</option>
         </select>
       </div>
@@ -190,7 +194,7 @@
     </div>
   </div>
 
-  <!-- ✅ NUEVO: REPORTE ANUAL IMPRIMIBLE -->
+  <!-- ✅ REPORTE ANUAL IMPRIMIBLE -->
   <div class="card">
     <b>Reporte anual (imprimible)</b>
     <div class="muted" style="margin-top:6px">
@@ -225,7 +229,7 @@
   </div>
 
   <div class="card" id="cardPersonal">
-    <b>Matriz del personal (EESS + Personal + DNI + días)</b>
+    <b>Matriz del personal (EESS + Personal + días) — Confidencial</b>
     <div class="scroll" style="margin-top:10px"><table id="matrizPersonal"></table></div>
   </div>
 
@@ -289,13 +293,10 @@ let BASE = [];
 let MANIFEST = null;
 
 let chartEESS=null, chartTipo=null;
-
-// ✅ nuevos charts
 let chartAnioMes=null, chartYearsTotal=null;
 
-// caches
-const YEAR_CACHE = new Map();      // año seleccionado -> {mes: total}
-const YEARS_TOTAL_CACHE = new Map(); // año -> total anual (general)
+const YEAR_CACHE = new Map();
+const YEARS_TOTAL_CACHE = new Map();
 
 const $ = (id)=>document.getElementById(id);
 const MONTHS = [
@@ -309,10 +310,44 @@ function unesc(s){ return String(s).replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m =
 function canonDNI(v){ return String(v ?? "").replace(/\D/g,""); }
 function diasEnMes(anio, mes){ return new Date(Number(anio), Number(mes), 0).getDate(); }
 
+/* =========================
+   ✅ CONFIDENCIALIDAD PROF
+========================= */
+let PROF_FULL_LIST = [];
+let PROF_FULL_TO_LABEL = new Map();
+let PROF_LABEL_TO_FULL = new Map();
+let PROF_SELECTED_FULL = "";
+
+function splitNameParts(full){
+  full = String(full||"").trim().replace(/\s+/g," ");
+  if(!full) return {names:[], lastnames:[]};
+  const parts = full.split(" ");
+  const lastnames = parts.length >= 2 ? parts.slice(-2) : parts.slice(-1);
+  const names = parts.slice(0, parts.length - lastnames.length);
+  return {names, lastnames};
+}
+function labelConfidencial(full){
+  const {names, lastnames} = splitNameParts(full);
+  const initials = names.map(n => (n[0] ? n[0].toUpperCase()+"." : "")).filter(Boolean).join(" ");
+  const ap = lastnames.join(" ");
+  return `${initials}${initials ? " " : ""}${ap}`.trim();
+}
+
+// ✅ seleccionar por clic en sugerencias
+window.selectProf = (full)=>{
+  PROF_SELECTED_FULL = unesc(full);
+  $("profSearch").value = PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL) || PROF_SELECTED_FULL;
+  $("profHits").textContent = "";
+  refreshCascada();
+  render();
+};
+
 $("btn").onclick = ()=>render();
 $("btnReset").onclick = ()=>{
-  $("estab").value=""; $("tipo").value=""; $("dni").value=""; $("prof").value="";
+  $("estab").value=""; $("tipo").value="";
   $("prest").value=""; $("modo").value="auto";
+  $("profSearch").value=""; $("profHits").textContent="";
+  PROF_SELECTED_FULL = "";
   refreshCascada(); render();
 };
 
@@ -329,10 +364,37 @@ $("tabEESS").onclick = ()=>{
   $("cardPersonal").style.display="none";
 };
 
-["estab","tipo","dni","prof","modo"].forEach(id=>{
+["estab","tipo","modo"].forEach(id=>{
   $(id).addEventListener("change", ()=>{ refreshCascada(); render(); });
 });
 $("prest").addEventListener("input", ()=>render());
+
+// ✅ buscador de profesional
+$("profSearch").addEventListener("input", ()=>{
+  const q = $("profSearch").value.trim().toLowerCase();
+  if(!q){
+    PROF_SELECTED_FULL = "";
+    $("profHits").textContent = "";
+    refreshCascada();
+    render();
+    return;
+  }
+
+  const hits = PROF_FULL_LIST
+    .filter(full => full.toLowerCase().includes(q) || (PROF_FULL_TO_LABEL.get(full)||"").toLowerCase().includes(q))
+    .slice(0, 25);
+
+  // auto-selección si hay 1
+  if(hits.length === 1) PROF_SELECTED_FULL = hits[0];
+  else PROF_SELECTED_FULL = "";
+
+  $("profHits").innerHTML = hits.map(full=>{
+    const lbl = esc(PROF_FULL_TO_LABEL.get(full) || full);
+    return `<span class="badge" style="margin:2px;cursor:pointer" onclick="selectProf('${esc(full)}')">${lbl}</span>`;
+  }).join(" ");
+
+  render();
+});
 
 $("btnCargarAnio").onclick = async ()=>{
   await cargarAnio(true);
@@ -384,7 +446,6 @@ async function cargarManifestYAuto(){
   refreshCascada();
   render();
 
-  // ✅ carga anual + totales por año al inicio
   await cargarAnio();
   await cargarTotalesPorAnios();
   renderAnual();
@@ -401,13 +462,13 @@ async function cargarMes(){
   BASE = await r.json();
 
   for(const x of BASE){
-    x.dni_prof = canonDNI(x.dni_prof);
+    x.dni_prof = canonDNI(x.dni_prof); // se conserva en data, pero no se muestra
   }
   $("estado").textContent = `Base lista: ${BASE.length} registros (${anio}-${String(mes).padStart(2,"0")})`;
 }
 
 /* =========================
-   ✅ CARGA ANUAL (por mes del año seleccionado)
+   ✅ CARGA ANUAL
 ========================= */
 async function cargarAnio(forzar=false){
   if(!MANIFEST) return;
@@ -457,15 +518,13 @@ function renderAnual(){
 }
 
 /* =========================
-   ✅ NUEVO: TOTALES POR AÑO (2023, 2024, 2025…)
-   Usa los años disponibles en manifest.json
+   ✅ TOTALES POR AÑO
 ========================= */
 async function cargarTotalesPorAnios(forzar=false){
   if(!MANIFEST) return;
 
   const years = [...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
 
-  // si ya está cargado y no forzamos, salimos
   if(!forzar){
     let ok = true;
     for(const y of years){ if(!YEARS_TOTAL_CACHE.has(y)) { ok=false; break; } }
@@ -474,7 +533,6 @@ async function cargarTotalesPorAnios(forzar=false){
 
   $("estado").textContent = `Cargando totales por año…`;
 
-  // Para cada año, sumamos la longitud de sus meses disponibles
   for(const y of years){
     if(!forzar && YEARS_TOTAL_CACHE.has(y)) continue;
 
@@ -490,9 +548,7 @@ async function cargarTotalesPorAnios(forzar=false){
         const r = await fetch(file + "?ts=" + Date.now());
         const data = await r.json();
         total += Array.isArray(data) ? data.length : 0;
-      }catch(e){
-        // si falta un archivo, simplemente no suma
-      }
+      }catch(e){}
     }
 
     YEARS_TOTAL_CACHE.set(y, total);
@@ -517,42 +573,38 @@ function renderTotalesPorAnios(){
   });
 }
 
+/* =========================
+   ✅ Cascada (sin DNI)
+========================= */
 function refreshCascada(){
   const estabSel = unesc($("estab").value);
   const tipoSel  = unesc($("tipo").value);
-  const dniSel   = unesc($("dni").value);
-  const profSel  = unesc($("prof").value);
 
   let d = BASE;
   if(estabSel) d = d.filter(x=>x.establecimiento===estabSel);
   if(tipoSel)  d = d.filter(x=>x.tipo_profesional===tipoSel);
-
-  let dDNI = d;
-  if(profSel) dDNI = dDNI.filter(x=>x.profesional===profSel);
-  const dnis = [...new Set(dDNI.map(x=>x.dni_prof).filter(Boolean))].sort();
-
-  let dPROF = d;
-  if(dniSel) dPROF = dPROF.filter(x=>x.dni_prof===dniSel);
-  const profCounts = new Map();
-  for(const x of dPROF){
-    const p = x.profesional || "";
-    if(!p) continue;
-    profCounts.set(p, (profCounts.get(p)||0)+1);
-  }
-  const profs = [...profCounts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,200).map(x=>x[0]);
 
   const estabs = [...new Set(d.map(x=>x.establecimiento).filter(Boolean))].sort();
   const tipos  = [...new Set(d.map(x=>x.tipo_profesional).filter(Boolean))].sort();
 
   $("estab").innerHTML = `<option value="">Todos</option>` + estabs.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join("");
   $("tipo").innerHTML  = `<option value="">Todos</option>` + tipos.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");
-  $("dni").innerHTML   = `<option value="">Todos</option>` + dnis.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  $("prof").innerHTML  = `<option value="">Todos</option>` + profs.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
 
+  // lista de profesionales
+  const profSet = new Set(d.map(x=>x.profesional).filter(Boolean));
+  PROF_FULL_LIST = [...profSet].sort((a,b)=>a.localeCompare(b,"es"));
+
+  PROF_FULL_TO_LABEL.clear();
+  PROF_LABEL_TO_FULL.clear();
+  for(const full of PROF_FULL_LIST){
+    const lbl = labelConfidencial(full);
+    PROF_FULL_TO_LABEL.set(full, lbl);
+    if(!PROF_LABEL_TO_FULL.has(lbl)) PROF_LABEL_TO_FULL.set(lbl, full);
+  }
+
+  // mantener seleccionados
   if(estabSel) $("estab").value = esc(estabSel);
   if(tipoSel)  $("tipo").value  = esc(tipoSel);
-  if(dniSel)   $("dni").value   = esc(dniSel);
-  if(profSel)  $("prof").value  = esc(profSel);
 }
 
 function filtrosTexto(){
@@ -561,24 +613,26 @@ function filtrosTexto(){
   const mesName = MONTHS.find(x=>String(x.n)===String(mes))?.t || mes;
   const estab = $("estab").value ? `EESS: ${unesc($("estab").value)}` : "EESS: Todos";
   const tipo  = $("tipo").value ? `Tipo: ${unesc($("tipo").value)}` : "Tipo: Todos";
-  const dni   = $("dni").value ? `DNI: ${unesc($("dni").value)}` : "DNI: -";
-  const prof  = $("prof").value ? `Profesional: ${unesc($("prof").value)}` : "Profesional: Todos";
   const prest = $("prest").value.trim() ? `Prestación: ${$("prest").value.trim()}` : "Prestación: -";
-  return `Periodo: ${anio} - ${mesName} | ${estab} | ${tipo} | ${dni} | ${prof} | ${prest}`;
+
+  const profLabel = PROF_SELECTED_FULL
+    ? `Profesional: ${PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL) || labelConfidencial(PROF_SELECTED_FULL)}`
+    : "Profesional: Todos";
+
+  return `Periodo: ${anio} - ${mesName} | ${estab} | ${tipo} | ${profLabel} | ${prest}`;
 }
 
 function aplicarFiltros(){
   const estab = unesc($("estab").value);
   const tipo  = unesc($("tipo").value);
-  const dni   = unesc($("dni").value);
-  const prof  = unesc($("prof").value);
   const prest = $("prest").value.trim().toLowerCase();
 
   let d = BASE;
   if(estab) d = d.filter(x=>x.establecimiento===estab);
   if(tipo)  d = d.filter(x=>x.tipo_profesional===tipo);
-  if(dni)   d = d.filter(x=>x.dni_prof===dni);
-  if(prof)  d = d.filter(x=>x.profesional===prof);
+
+  const profFull = (PROF_SELECTED_FULL || "").trim();
+  if(profFull) d = d.filter(x=>x.profesional===profFull);
 
   if(prest){
     d = d.filter(x=>{
@@ -607,15 +661,6 @@ function render(){
 function renderMatrizPersonal(d, nDias){
   const days = Array.from({length:nDias},(_,i)=>i+1);
   const modo = $("modo").value;
-  const dniSel = unesc($("dni").value);
-  const profSel = unesc($("prof").value);
-
-  let keyMode = modo;
-  if(modo === "auto"){
-    if(dniSel) keyMode = "por_dni_resumen";
-    else if(profSel) keyMode = "resumen";
-    else keyMode = "por_dni";
-  }
 
   const map = new Map();
 
@@ -623,21 +668,18 @@ function renderMatrizPersonal(d, nDias){
     const e = r.establecimiento || "SIN EESS";
     const p = r.profesional || "SIN PROFESIONAL";
     const t = r.tipo_profesional || "SIN TIPO";
-    const dni = r.dni_prof || "";
 
-    if(keyMode === "resumen") return ["__ALL__", p, t].join("||");
-    if(keyMode === "por_dni_resumen") return ["__ALL__", p, t, dni].join("||");
-    return [e, p, t, dni].join("||");
+    if(modo === "resumen") return ["__ALL__", p, t].join("||");
+    return [e, p, t].join("||");
   }
 
   for(const r of d){
     const k = makeKey(r);
     if(!map.has(k)){
       map.set(k, {
-        establecimiento: (keyMode==="resumen"||keyMode==="por_dni_resumen") ? "TODOS" : (r.establecimiento||"SIN EESS"),
+        establecimiento: (modo==="resumen") ? "TODOS" : (r.establecimiento||"SIN EESS"),
         profesional: r.profesional||"SIN PROFESIONAL",
         profesion: r.tipo_profesional||"SIN TIPO",
-        dni_prof: (keyMode==="resumen") ? "-" : (r.dni_prof||""),
         d: Object.fromEntries(days.map(x=>[x,0])),
         total:0
       });
@@ -654,9 +696,8 @@ function renderMatrizPersonal(d, nDias){
 
   let html = `<tr>
     <th class="left">ESTABLECIMIENTO</th>
-    <th class="left">PERSONAL</th>
+    <th class="left">PERSONAL (CONFIDENCIAL)</th>
     <th class="left">PROFESIÓN</th>
-    <th>DNI</th>
     ${days.map(x=>`<th>${x}</th>`).join("")}
     <th>Total</th>
   </tr>`;
@@ -664,9 +705,8 @@ function renderMatrizPersonal(d, nDias){
   for(const r of rows){
     html += `<tr>
       <td class="left">${esc(r.establecimiento)}</td>
-      <td class="left">${esc(r.profesional)}</td>
+      <td class="left">${esc(labelConfidencial(r.profesional))}</td>
       <td class="left">${esc(r.profesion)}</td>
-      <td>${esc(r.dni_prof)}</td>
       ${days.map(dy=>`<td>${r.d[dy]||0}</td>`).join("")}
       <td><b>${r.total}</b></td>
     </tr>`;
@@ -755,3 +795,4 @@ cargarManifestYAuto();
 </script>
 </body>
 </html>
+
