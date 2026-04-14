@@ -8,557 +8,562 @@
 
 <style>
   :root{
-    --bg:#070b18;
-    --card: rgba(255,255,255,.92);
-    --card2: rgba(255,255,255,.86);
-    --text:#0f172a;
-    --muted:#6b7280;
-    --border: rgba(148,163,184,.35);
-    --shadow: 0 18px 50px rgba(0,0,0,.30);
-    --radius: 18px;
-
-    --accent: rgba(79,70,229,.9);
-    --accentSoft: rgba(79,70,229,.10);
+    --azul:      #1e40af;
+    --azul2:     #1d4ed8;
+    --azul3:     #3b82f6;
+    --azulclaro: #eff6ff;
+    --cian:      #0891b2;
+    --verde:     #059669;
+    --morado:    #7c3aed;
+    --texto:     #0f172a;
+    --muted:     #64748b;
+    --borde:     #e2e8f0;
+    --fondo:     #f1f5f9;
+    --blanco:    #ffffff;
+    --radio:     12px;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;margin:0;padding:0}
+
   body{
-    margin:0; font-family:Segoe UI,Arial,sans-serif;
-    color:var(--text);
-    background:
-      radial-gradient(1200px 600px at 10% 0%, rgba(79,70,229,.25), transparent 60%),
-      radial-gradient(900px 500px at 90% 10%, rgba(6,182,212,.20), transparent 60%),
-      linear-gradient(180deg, #070b18, #0b1430);
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:var(--fondo);
+    color:var(--texto);
     overflow-x:hidden;
   }
-  #fx{position:fixed; inset:0; z-index:-1;}
 
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
   header{
-    position:sticky; top:0; z-index:50;
-    background: rgba(255,255,255,.88);
-    backdrop-filter: blur(10px);
-    border-bottom:1px solid rgba(226,232,240,.9);
-    padding:14px 18px;
-    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    position:sticky;top:0;z-index:10;
+    background:var(--blanco);
+    border-bottom:2px solid var(--borde);
+    padding:12px 20px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
   }
-  .brand{display:flex; gap:10px; align-items:center}
-  .brand img{height:46px; object-fit:contain}
-  h1{margin:0;font-size:18px}
-  .badge{
-    display:inline-block; padding:2px 10px;
-    border:1px solid rgba(226,232,240,.9);
-    border-radius:999px; background:#fff; font-size:12px; color:#111827;
+  .brand{display:flex;gap:12px;align-items:center}
+  .brand img{height:48px;object-fit:contain}
+  .brand-logo-fallback{
+    width:48px;height:48px;border-radius:10px;
+    background:var(--azul);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:11px;color:#fff;text-align:center;line-height:1.3;
+    flex-shrink:0;
   }
+  .brand-texto h1{font-size:16px;font-weight:700;color:var(--texto);margin:0}
+  .brand-texto .sub{font-size:11px;color:var(--muted);margin-top:1px}
 
-  .wrap{max-width:1550px;margin:0 auto;padding:12px 0 26px}
+  .header-derecha{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  .bloque-fechas{
+    background:var(--azulclaro);
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+    padding:7px 14px;
+    font-size:11px;
+    line-height:1.6;
+  }
+  .bloque-fechas .f1{color:var(--azul);font-weight:700;font-size:12px}
+  .bloque-fechas .f2{color:var(--muted)}
+
+  .badge-estado{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:5px 12px;
+    border:1px solid #bbf7d0;
+    border-radius:999px;
+    background:#f0fdf4;
+    font-size:11px;
+    color:#166534;
+    font-weight:600;
+  }
+  .badge-estado::before{content:'';width:7px;height:7px;border-radius:50%;background:#16a34a;flex-shrink:0}
+
+  .btn-print{
+    background:var(--azul);color:#fff;border:none;
+    padding:9px 18px;border-radius:10px;
+    font-size:12px;font-weight:700;cursor:pointer;
+    transition:background .15s;
+  }
+  .btn-print:hover{background:var(--azul2)}
+
+  /* ══════════════════════════════
+     LAYOUT
+  ══════════════════════════════ */
+  .wrap{max-width:1600px;margin:0 auto;padding:14px 18px 30px}
+
   .card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    box-shadow: var(--shadow);
-    padding:12px;
-    margin:12px 18px;
+    background:var(--blanco);
+    border:1px solid var(--borde);
+    border-radius:var(--radio);
+    padding:14px 16px;
+    margin-bottom:12px;
   }
-  .card.soft{background:var(--card2)}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  .card-titulo{
+    font-size:13px;font-weight:700;color:var(--texto);
+    margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--borde);
+  }
+  .card-titulo .icono{
+    width:26px;height:26px;border-radius:7px;
+    background:var(--azulclaro);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;flex-shrink:0;
+  }
+  .card.soft{background:#f8fafc}
 
-  label{font-size:12px;color:#111827}
-  select,input,button{
-    padding:10px 10px;
-    border:1px solid rgba(203,213,225,.95);
-    border-radius:14px;
-    background:#fff;
+  /* ══════════════════════════════
+     KPI CARDS
+  ══════════════════════════════ */
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .kpi{
+    background:var(--blanco);
+    border:1px solid var(--borde);
+    border-radius:var(--radio);
+    padding:14px 16px;
+    border-top:3px solid var(--azul);
+  }
+  .kpi.k2{border-top-color:var(--cian)}
+  .kpi.k3{border-top-color:var(--verde)}
+  .kpi.k4{border-top-color:var(--morado)}
+  .kpi .klabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
+  .kpi .kval{font-size:28px;font-weight:800;color:var(--texto);line-height:1}
+  .kpi .ksub{font-size:11px;color:var(--muted);margin-top:5px}
+
+  /* ══════════════════════════════
+     FILTROS
+  ══════════════════════════════ */
+  .filtros-nota{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .fg{display:flex;flex-direction:column;gap:4px}
+  .fg label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+  select,input{
+    padding:8px 10px;
+    border:1px solid #cbd5e1;
+    border-radius:9px;
+    background:#f8fafc;
+    color:var(--texto);
+    font-size:12px;
     outline:none;
+    transition:border-color .15s;
   }
-  input:focus, select:focus{
-    border-color: rgba(79,70,229,.45);
-    box-shadow: 0 0 0 4px rgba(79,70,229,.10);
+  select:focus,input:focus{border-color:var(--azul);background:#fff}
+  .btn-ap{
+    background:var(--azul);color:#fff;border:none;
+    padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;
   }
-  button{cursor:pointer}
-  button:hover{transform:translateY(-1px)}
-  .muted{color:var(--muted);font-size:12px;line-height:1.35}
+  .btn-ap:hover{background:var(--azul2)}
+  .btn-cl{
+    background:#f1f5f9;border:1px solid #cbd5e1;color:#475569;
+    padding:8px 14px;border-radius:9px;font-size:12px;cursor:pointer;
+  }
+  .btn-cl:hover{background:#e2e8f0}
+  .muted{color:var(--muted);font-size:11px;line-height:1.4}
 
-  table{border-collapse:collapse;width:100%;font-size:12px;background:#fff;border-radius:14px;overflow:hidden}
-  th,td{border:1px solid #e5e7eb;padding:4px 6px;text-align:center;white-space:nowrap}
-  th{background:#f3f4f6;position:sticky;top:0}
-  .left{text-align:left}
-  .scroll{overflow:auto;max-height:560px;border-radius:14px}
+  .badge{
+    display:inline-block;padding:3px 10px;
+    border:1px solid var(--borde);
+    border-radius:999px;background:#f8fafc;font-size:12px;color:var(--texto);
+  }
 
+  /* ══════════════════════════════
+     GRÁFICOS
+  ══════════════════════════════ */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+  .chartbox{
+    border:1px solid var(--borde);border-radius:10px;
+    padding:12px;background:#f8fafc;
+  }
+  .chartbox-titulo{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+  .chartbox canvas{height:220px !important;max-height:220px !important}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+  /* ══════════════════════════════
+     KPI ANUAL
+  ══════════════════════════════ */
+  .kpi-anual-badge{
+    display:inline-block;
+    background:var(--azulclaro);
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+    padding:6px 16px;
+    font-size:13px;font-weight:700;color:var(--azul);
+  }
+  .btn-cargar{
+    background:#f1f5f9;border:1px solid #cbd5e1;color:#374151;
+    padding:7px 14px;border-radius:9px;font-size:12px;cursor:pointer;
+  }
+  .btn-cargar:hover{background:#e2e8f0}
+
+  /* ══════════════════════════════
+     TABS
+  ══════════════════════════════ */
   .tabs{display:flex;gap:8px;flex-wrap:wrap}
   .tab{
-    padding:8px 12px;border:1px solid rgba(203,213,225,.95);
-    border-radius:999px;background:#fff;cursor:pointer;font-size:13px;
-  }
-  .tab.active{background:rgba(79,70,229,.10);border-color:rgba(79,70,229,.35);font-weight:600}
-
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-  .chartbox{border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#fff}
-  .chartbox canvas{height:210px !important; max-height:210px !important;}
-  @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
-
-  /* =========================
-     ✅ AUTOCOMPLETE PRO
-  ========================= */
-  .ac{
-    position:relative;
-    width:100%;
-  }
-  .acMeta{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
-    margin-top:4px;
-    flex-wrap:wrap;
-  }
-  .acHint{
-    color: var(--muted);
-    font-size:12px;
-  }
-  .acPill{
-    font-size:11px;
-    padding:2px 10px;
+    padding:7px 16px;
+    border:1px solid var(--borde);
     border-radius:999px;
-    border:1px solid rgba(203,213,225,.95);
-    background:#fff;
-    color:#111827;
+    background:#f8fafc;
+    cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);
+    transition:all .15s;
   }
-  .acPanel{
-    position:absolute;
-    top: calc(100% + 6px);
-    left:0;
-    right:0;
-    background:#fff;
-    border:1px solid rgba(203,213,225,.95);
-    border-radius:14px;
-    box-shadow: 0 18px 50px rgba(0,0,0,.18);
-    overflow:hidden;
-    z-index:60;
-    display:none;
+  .tab.active{
+    background:var(--azul);border-color:var(--azul);
+    color:#fff;font-weight:700;
   }
-  .acPanel.open{display:block}
-  .acHeader{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-    padding:10px 10px;
-    border-bottom:1px solid #eef2f7;
-    background: linear-gradient(180deg, rgba(79,70,229,.06), rgba(79,70,229,.02));
+
+  /* ══════════════════════════════
+     TABLAS
+  ══════════════════════════════ */
+  .scroll{overflow:auto;max-height:560px;border-radius:10px;border:1px solid var(--borde)}
+  table{border-collapse:collapse;width:100%;font-size:11px;background:#fff}
+  th{
+    background:var(--azul);color:#fff;
+    padding:6px 7px;text-align:center;white-space:nowrap;
+    position:sticky;top:0;z-index:2;font-weight:600;font-size:11px;
   }
-  .acTitle{
-    font-size:12px;
-    color:#111827;
-    font-weight:700;
-  }
-  .acClose{
-    font-size:12px;
-    border:1px solid rgba(203,213,225,.95);
-    background:#fff;
-    border-radius:999px;
-    padding:4px 10px;
-    cursor:pointer;
-  }
-  .acList{
-    max-height:260px;
-    overflow:auto;
-  }
-  .acItem{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    padding:10px 10px;
-    cursor:pointer;
+  th.left{text-align:left}
+  th.th-total{background:#1e3a8a}
+  td{
     border-bottom:1px solid #f1f5f9;
+    padding:4px 6px;text-align:center;
+    white-space:nowrap;color:#334155;font-size:11px;
   }
-  .acItem:last-child{border-bottom:none}
-  .acItem:hover{
-    background: rgba(79,70,229,.06);
-  }
-  .acItem.active{
-    background: rgba(79,70,229,.10);
-  }
-  .acName{
-    font-weight:700;
-    font-size:13px;
-    color:#111827;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    max-width: 75%;
-  }
-  .acSub{
-    font-size:12px;
-    color: var(--muted);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  mark{
-    background: rgba(6,182,212,.18);
-    padding:0 2px;
-    border-radius:4px;
-  }
+  tr:nth-child(even) td{background:#f8fafc}
+  tr:hover td{background:#eff6ff !important}
+  .left{text-align:left}
+  .td-eess{text-align:left !important;font-weight:600;color:var(--texto);max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  .td-prof{text-align:left !important;color:var(--texto);font-weight:500}
+  .td-prof-tipo{text-align:left !important;color:var(--muted)}
+  .td-total{font-weight:800;color:var(--azul);font-size:12px}
 
+  /* Heatmap en celdas */
+  .c-hot{background:#1e40af !important;color:#fff !important;font-weight:700;border-radius:3px}
+  .c-med{background:#bfdbfe !important;color:#1e3a8a !important;font-weight:600;border-radius:3px}
+  .c-low{background:#f0f9ff !important;color:#0369a1 !important}
+
+  .leyenda{display:flex;gap:14px;margin-top:8px;font-size:10px;color:var(--muted)}
+  .leyenda span{display:flex;align-items:center;gap:5px}
+  .leyenda-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+  /* ══════════════════════════════
+     IMPRESIÓN
+  ══════════════════════════════ */
   #printHeader,#printFooter{display:none}
+
   @media print{
+    body{background:#fff}
     header,.no-print{display:none !important}
-    #fx{display:none}
-    .card{margin:0 0 10px 0; box-shadow:none; background:#fff; border:0}
+    .card{margin:0 0 8px 0;box-shadow:none;background:#fff;border:1px solid #e5e7eb;border-radius:6px}
     .scroll{max-height:none;overflow:visible;border:0}
-    #printHeader{display:flex !important; gap:12px; align-items:center; margin-bottom:10px}
-    #printHeader img{height:55px}
-    #printTitle{margin:0;font-size:18px;font-weight:800}
-    #printSub{font-size:12px;color:#374151;margin-top:3px}
-    #printFooter{display:block !important;margin-top:10px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:11px;color:#374151;text-align:center}
-    #img_c_anio_mes, #img_c_years_total{ display:block !important; }
-    #c_anio_mes, #c_years_total{ display:none !important; }
+    .kpis{grid-template-columns:repeat(4,1fr)}
+
+    #printHeader{
+      display:flex !important;gap:12px;align-items:center;
+      margin-bottom:10px;padding-bottom:8px;
+      border-bottom:2px solid #1e40af;
+    }
+    #printHeader img{height:52px}
+    #printTitle{margin:0;font-size:17px;font-weight:800;color:#1e40af}
+    #printSub{font-size:11px;color:#374151;margin-top:3px}
+    #printFechas{font-size:10px;color:#64748b;margin-top:2px}
+
+    #printFooter{
+      display:block !important;
+      margin-top:10px;padding-top:8px;
+      border-top:1px solid #e5e7eb;
+      font-size:10px;color:#64748b;text-align:center;
+    }
+
+    #img_c_anio_mes,#img_c_years_total{display:block !important}
+    #c_anio_mes,#c_years_total{display:none !important}
+
+    th{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .c-hot{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .c-med{background:#bfdbfe !important;color:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .kpi{border-top-width:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
 </head>
 
 <body>
-<canvas id="fx"></canvas>
 
+<!-- ═══════════════════════════════
+     HEADER
+═══════════════════════════════ -->
 <header>
   <div class="brand">
-    <img src="logo.png" alt="USPP Chupaca" onerror="this.style.display='none'">
-    <div>
+    <img src="logo.png" alt="USPP Chupaca" id="logoImg"
+         onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+    <div class="brand-logo-fallback" id="logoFallback" style="display:none">USPP<br>CHU</div>
+    <div class="brand-texto">
       <h1>Dashboard de Producción — USPP Chupaca</h1>
-      <span class="badge" id="estado">Cargando…</span>
+      <div class="sub">Sistema de Información del Personal de Salud</div>
     </div>
   </div>
-  <div class="row">
-    <button onclick="window.print()">🖨️ Imprimir reporte</button>
+
+  <div class="header-derecha">
+    <div class="bloque-fechas">
+      <div class="f1" id="fechaActualizacion">⏱ Actualizado: cargando…</div>
+      <div class="f2" id="fechaDigitacion">Fecha de digitación al: —</div>
+    </div>
+    <div class="badge-estado" id="estado">Cargando…</div>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir reporte</button>
   </div>
 </header>
 
+<!-- ═══════════════════════════════
+     CONTENIDO
+═══════════════════════════════ -->
 <div class="wrap">
 
-  <div class="card" id="printHeader">
+  <!-- Encabezado para impresión -->
+  <div id="printHeader">
     <img src="logo.png" alt="USPP Chupaca" onerror="this.style.display='none'">
     <div>
-      <p id="printTitle">PRODUCCIÓN DEL PERSONAL DE SALUD</p>
+      <p id="printTitle">PRODUCCIÓN DEL PERSONAL DE SALUD — USPP CHUPACA</p>
       <div id="printSub"></div>
+      <div id="printFechas"></div>
     </div>
   </div>
 
-  <div class="card no-print">
-    <b>Filtros inteligentes (cascada)</b>
-    <div class="muted" style="margin-top:6px">
-      <b style="color:#0f172a">Modo confidencial:</b> no se muestra DNI, solo iniciales + apellidos.
+  <!-- KPIs -->
+  <div class="kpis no-print" id="kpiCards">
+    <div class="kpi">
+      <div class="klabel">Total registros</div>
+      <div class="kval" id="kpiTotal">—</div>
+      <div class="ksub" id="kpiTotalSub">Mes seleccionado</div>
     </div>
+    <div class="kpi k2">
+      <div class="klabel">Profesionales activos</div>
+      <div class="kval" id="kpiProfs">—</div>
+      <div class="ksub">Con producción</div>
+    </div>
+    <div class="kpi k3">
+      <div class="klabel">Establecimientos</div>
+      <div class="kval" id="kpiEESS">—</div>
+      <div class="ksub">Con producción</div>
+    </div>
+    <div class="kpi k4">
+      <div class="klabel">Promedio diario</div>
+      <div class="kval" id="kpiProm">—</div>
+      <div class="ksub">Registros / día</div>
+    </div>
+  </div>
 
-    <div class="row" style="margin-top:10px">
-      <div>
-        <label>Año</label><br><select id="anio"></select>
+  <!-- FILTROS -->
+  <div class="card no-print">
+    <div class="card-titulo"><div class="icono">🔍</div> Filtros inteligentes (cascada)</div>
+    <div class="filtros-nota">
+      DNI usado = <b>DNI Resp. Aten.</b> (profesional). No se cruza con DNI del paciente.
+      &nbsp;·&nbsp; <b>Modo confidencial:</b> solo se muestran iniciales + apellidos.
+    </div>
+    <div class="row">
+      <div class="fg">
+        <label>Año</label>
+        <select id="anio"></select>
       </div>
-      <div>
-        <label>Mes</label><br><select id="mes"></select>
+      <div class="fg">
+        <label>Mes</label>
+        <select id="mes"></select>
       </div>
-      <div style="min-width:260px;flex:1">
-        <label>Establecimiento (EESS)</label><br><select id="estab"><option value="">Todos</option></select>
+      <div class="fg" style="min-width:240px;flex:1">
+        <label>Establecimiento (EESS)</label>
+        <select id="estab"><option value="">Todos</option></select>
       </div>
-      <div style="min-width:220px;flex:1">
-        <label>Tipo profesional</label><br><select id="tipo"><option value="">Todos</option></select>
+      <div class="fg" style="min-width:200px;flex:1">
+        <label>Tipo profesional</label>
+        <select id="tipo"><option value="">Todos</option></select>
       </div>
-
-      <!-- ✅ AUTOCOMPLETE PRO -->
-      <div style="min-width:340px;flex:1">
-        <label>Profesional (buscar por apellido o nombre)</label><br>
-
-        <div class="ac">
-          <input id="profSearch" autocomplete="off" placeholder="Escribe: illesca, carrillo, ana..." style="width:100%">
-
-          <div id="profPanel" class="acPanel">
-            <div class="acHeader">
-              <div class="acTitle" id="profTitle">Resultados</div>
-              <button class="acClose" type="button" id="profClose">Esc</button>
-            </div>
-            <div class="acList" id="profList"></div>
-          </div>
-        </div>
-
-        <div class="acMeta">
-          <div class="acHint">Ejemplo: Junior Aldair Illesca Medina → <b>J. A. Illesca Medina</b></div>
-          <div class="acPill" id="profPill">Profesional: Todos</div>
-        </div>
+      <div class="fg" style="min-width:300px;flex:2">
+        <label>Profesional (buscar por apellido o nombre)</label>
+        <input id="profSearch" placeholder="Escribe: illesca, carrillo, ana..." style="width:100%">
+        <div class="muted" style="margin-top:3px">Ej: Junior Aldair Illesca Medina → <b>J. A. Illesca Medina</b></div>
+        <div id="profHits" class="muted" style="margin-top:4px"></div>
       </div>
-
-      <div style="min-width:240px;flex:1">
-        <label>Prestación (opcional)</label><br>
+      <div class="fg" style="min-width:220px;flex:1">
+        <label>Prestación (opcional)</label>
         <input id="prest" placeholder="Buscar servicio o ID (ej: 56 o obstetricia)" style="width:100%">
       </div>
-
-      <div>
-        <label>Modo matriz personal</label><br>
+      <div class="fg">
+        <label>Modo matriz personal</label>
         <select id="modo" style="width:190px">
           <option value="auto" selected>Auto (recomendado)</option>
           <option value="por_dni">Por profesional (detalle)</option>
           <option value="resumen">Resumen (1 fila)</option>
         </select>
       </div>
-
-      <button id="btn">Aplicar</button>
-      <button id="btnReset">Limpiar</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn-ap" id="btn">Aplicar</button>
+        <button class="btn-cl" id="btnReset">Limpiar</button>
+      </div>
     </div>
   </div>
 
+  <!-- GRÁFICOS GENERALES -->
   <div class="card no-print">
-    <b>Gráficos (vista general)</b>
+    <div class="card-titulo"><div class="icono">📊</div> Gráficos — vista general</div>
     <div class="grid">
       <div class="chartbox">
-        <div style="font-weight:600;margin-bottom:6px">Top 15 EESS (por registros)</div>
+        <div class="chartbox-titulo">Top 15 establecimientos (por registros)</div>
         <canvas id="c_eess"></canvas>
       </div>
       <div class="chartbox">
-        <div style="font-weight:600;margin-bottom:6px">Distribución por Tipo Profesional</div>
+        <div class="chartbox-titulo">Distribución por tipo profesional</div>
         <canvas id="c_tipo"></canvas>
       </div>
     </div>
   </div>
 
+  <!-- REPORTE ANUAL -->
   <div class="card">
-    <b>Reporte anual (imprimible)</b>
-    <div class="muted" style="margin-top:6px">
+    <div class="card-titulo"><div class="icono">📅</div> Reporte anual (imprimible)</div>
+    <div class="muted" style="margin-bottom:10px">
       Total anual y producción por mes del año seleccionado + comparativo total por año.
     </div>
-
-    <div class="row" style="margin-top:10px;align-items:center">
-      <div class="badge" id="kpiAnual">Total anual: —</div>
-      <button class="no-print" id="btnCargarAnio" style="margin-left:auto">📅 Cargar año</button>
+    <div class="row" style="align-items:center;margin-bottom:10px">
+      <div class="kpi-anual-badge" id="kpiAnual">Total anual: —</div>
+      <button class="btn-cargar no-print" id="btnCargarAnio" style="margin-left:auto">📅 Cargar año</button>
     </div>
-
-    <div class="grid" style="margin-top:10px">
+    <div class="grid">
       <div class="chartbox">
-        <div style="font-weight:600;margin-bottom:6px">Producción por mes (Año seleccionado)</div>
+        <div class="chartbox-titulo">Producción por mes (año seleccionado)</div>
         <canvas id="c_anio_mes"></canvas>
         <img id="img_c_anio_mes" style="display:none;width:100%;max-height:260px;object-fit:contain" alt="">
       </div>
-
       <div class="chartbox">
-        <div style="font-weight:600;margin-bottom:6px">Total por año (comparativo)</div>
+        <div class="chartbox-titulo">Total por año (comparativo)</div>
         <canvas id="c_years_total"></canvas>
         <img id="img_c_years_total" style="display:none;width:100%;max-height:260px;object-fit:contain" alt="">
       </div>
     </div>
   </div>
 
+  <!-- TABS -->
   <div class="card soft no-print">
     <div class="tabs">
-      <div class="tab active" id="tabPersonal">Matriz del personal</div>
-      <div class="tab" id="tabEESS">Matriz por establecimiento</div>
+      <div class="tab active" id="tabPersonal">👤 Matriz del personal</div>
+      <div class="tab" id="tabEESS">🏥 Matriz por establecimiento</div>
     </div>
   </div>
 
+  <!-- MATRIZ PERSONAL -->
   <div class="card" id="cardPersonal">
-    <b>Matriz del personal (EESS + Personal + días) — Confidencial</b>
-    <div class="scroll" style="margin-top:10px"><table id="matrizPersonal"></table></div>
+    <div class="card-titulo"><div class="icono">👤</div> Matriz del personal (EESS + Personal + días) — Confidencial</div>
+    <div class="scroll" style="margin-top:4px"><table id="matrizPersonal"></table></div>
+    <div class="leyenda">
+      <span><span class="leyenda-dot" style="background:#1e40af"></span> Alta producción</span>
+      <span><span class="leyenda-dot" style="background:#bfdbfe"></span> Media producción</span>
+      <span><span class="leyenda-dot" style="background:#f0f9ff"></span> Baja producción</span>
+    </div>
   </div>
 
+  <!-- MATRIZ EESS -->
   <div class="card" id="cardEESS" style="display:none">
-    <b>Matriz por establecimiento (EESS x días)</b>
-    <div class="scroll" style="margin-top:10px"><table id="matrizEESS"></table></div>
+    <div class="card-titulo"><div class="icono">🏥</div> Matriz por establecimiento (EESS × días)</div>
+    <div class="scroll" style="margin-top:4px"><table id="matrizEESS"></table></div>
   </div>
 
+  <!-- FOOTER IMPRESIÓN -->
   <div class="card" id="printFooter">
-    Sistema creado por Junior Aldair Illesca Medina - USPP
+    Sistema creado por Junior Aldair Illesca Medina — USPP Chupaca &nbsp;|&nbsp; <span id="printFechaFooter"></span>
   </div>
-</div>
+
+</div><!-- /wrap -->
 
 <script>
-/* Fondo partículas */
-(function particles(){
-  const c = document.getElementById("fx");
-  const ctx = c.getContext("2d");
-  let w,h,pts=[];
-  function resize(){
-    w = c.width = window.innerWidth * devicePixelRatio;
-    h = c.height = window.innerHeight * devicePixelRatio;
-    c.style.width = window.innerWidth+"px";
-    c.style.height = window.innerHeight+"px";
-    pts = Array.from({length: 80}, ()=>( {
-      x: Math.random()*w, y: Math.random()*h,
-      vx: (Math.random()-.5)*0.25*devicePixelRatio,
-      vy: (Math.random()-.5)*0.25*devicePixelRatio,
-      r: (Math.random()*1.8 + .8)*devicePixelRatio
-    }));
-  }
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    for(const p of pts){
-      p.x += p.vx; p.y += p.vy;
-      if(p.x<0||p.x>w) p.vx*=-1;
-      if(p.y<0||p.y>h) p.vy*=-1;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = "rgba(255,255,255,.55)";
-      ctx.fill();
-    }
-    for(let i=0;i<pts.length;i++){
-      for(let j=i+1;j<pts.length;j++){
-        const a=pts[i], b=pts[j];
-        const dx=a.x-b.x, dy=a.y-b.y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d < 140*devicePixelRatio){
-          ctx.strokeStyle = `rgba(255,255,255,${0.10*(1-d/(140*devicePixelRatio))})`;
-          ctx.lineWidth = 1*devicePixelRatio;
-          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener("resize", resize);
-  resize(); draw();
-})();
-
+/* ══════════════════════════════════════════
+   ESTADO GLOBAL
+══════════════════════════════════════════ */
 let BASE = [];
 let MANIFEST = null;
-
-let chartEESS=null, chartTipo=null;
-let chartAnioMes=null, chartYearsTotal=null;
-
-const YEAR_CACHE = new Map();
+let chartEESS=null, chartTipo=null, chartAnioMes=null, chartYearsTotal=null;
+const YEAR_CACHE       = new Map();
 const YEARS_TOTAL_CACHE = new Map();
+const $ = id => document.getElementById(id);
 
-const $ = (id)=>document.getElementById(id);
 const MONTHS = [
-  {n:1, t:"Enero"},{n:2,t:"Febrero"},{n:3,t:"Marzo"},{n:4,t:"Abril"},
+  {n:1,t:"Enero"},{n:2,t:"Febrero"},{n:3,t:"Marzo"},{n:4,t:"Abril"},
   {n:5,t:"Mayo"},{n:6,t:"Junio"},{n:7,t:"Julio"},{n:8,t:"Agosto"},
   {n:9,t:"Septiembre"},{n:10,t:"Octubre"},{n:11,t:"Noviembre"},{n:12,t:"Diciembre"}
 ];
 
-function esc(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function unesc(s){ return String(s).replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m => ({'&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'" }[m])); }
-function canonDNI(v){ return String(v ?? "").replace(/\D/g,""); }
-function diasEnMes(anio, mes){ return new Date(Number(anio), Number(mes), 0).getDate(); }
+/* Paleta de colores para gráficos */
+const PALETTE = [
+  "#1e40af","#0891b2","#059669","#7c3aed",
+  "#b45309","#be185d","#0e7490","#065f46",
+  "#4338ca","#c2410c","#0369a1","#6d28d9"
+];
 
-/* =========================
-   ✅ CONFIDENCIALIDAD PROF
-========================= */
-let PROF_FULL_LIST = [];             // full names
-let PROF_SELECTED_FULL = "";         // selección real (full)
-let PROF_FULL_TO_LABEL = new Map();  // full -> "J. A. Apellidos"
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+function unesc(s){ return String(s).replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m=>({'&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'"}[m])) }
+function canonDNI(v){ return String(v??"").replace(/\D/g,"") }
+function diasEnMes(anio,mes){ return new Date(Number(anio),Number(mes),0).getDate() }
+
+function formatFecha(str){
+  /* Convierte "2026-04-08 11:30:48" → "08/04/2026 11:30 AM/PM" */
+  if(!str) return "—";
+  const d = new Date(str.replace(" ","T"));
+  if(isNaN(d)) return str;
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const yyyy = d.getFullYear();
+  let h = d.getHours(), ampm = h>=12?"PM":"AM";
+  h = h%12 || 12;
+  const min = String(d.getMinutes()).padStart(2,"0");
+  return `${dd}/${mm}/${yyyy} ${h}:${min} ${ampm}`;
+}
+
+/* ══════════════════════════════════════════
+   CONFIDENCIALIDAD PROFESIONAL
+══════════════════════════════════════════ */
+let PROF_FULL_LIST      = [];
+let PROF_FULL_TO_LABEL  = new Map();
+let PROF_LABEL_TO_FULL  = new Map();
+let PROF_SELECTED_FULL  = "";
 
 function splitNameParts(full){
   full = String(full||"").trim().replace(/\s+/g," ");
-  if(!full) return {names:[], lastnames:[]};
+  if(!full) return {names:[],lastnames:[]};
   const parts = full.split(" ");
-  const lastnames = parts.length >= 2 ? parts.slice(-2) : parts.slice(-1);
-  const names = parts.slice(0, parts.length - lastnames.length);
-  return {names, lastnames};
+  const lastnames = parts.length>=2 ? parts.slice(-2) : parts.slice(-1);
+  const names = parts.slice(0, parts.length-lastnames.length);
+  return {names,lastnames};
 }
 function labelConfidencial(full){
-  const {names, lastnames} = splitNameParts(full);
-  const initials = names.map(n => (n[0] ? n[0].toUpperCase()+"." : "")).filter(Boolean).join(" ");
-  const ap = lastnames.join(" ");
-  return `${initials}${initials ? " " : ""}${ap}`.trim();
-}
-function updateProfPill(){
-  const pill = $("profPill");
-  if(!PROF_SELECTED_FULL){
-    pill.textContent = "Profesional: Todos";
-  }else{
-    pill.textContent = "Profesional: " + (PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL) || labelConfidencial(PROF_SELECTED_FULL));
-  }
+  const {names,lastnames} = splitNameParts(full);
+  const ini = names.map(n=>(n[0]?n[0].toUpperCase()+".":"")).filter(Boolean).join(" ");
+  return `${ini}${ini?" ":""}${lastnames.join(" ")}`.trim();
 }
 
-/* =========================
-   ✅ AUTOCOMPLETE PRO (UI)
-========================= */
-let AC_RESULTS = [];
-let AC_ACTIVE = -1;
-
-function openPanel(){
-  $("profPanel").classList.add("open");
-}
-function closePanel(){
-  $("profPanel").classList.remove("open");
-  AC_ACTIVE = -1;
-}
-function setActive(idx){
-  AC_ACTIVE = idx;
-  const items = $("profList").querySelectorAll(".acItem");
-  items.forEach((el,i)=>el.classList.toggle("active", i===idx));
-  if(idx>=0 && items[idx]){
-    items[idx].scrollIntoView({block:"nearest"});
-  }
-}
-function highlight(text, q){
-  if(!q) return esc(text);
-  const s = text;
-  const i = s.toLowerCase().indexOf(q.toLowerCase());
-  if(i<0) return esc(s);
-  const a = esc(s.slice(0,i));
-  const b = esc(s.slice(i,i+q.length));
-  const c = esc(s.slice(i+q.length));
-  return `${a}<mark>${b}</mark>${c}`;
-}
-function selectProf(full){
-  PROF_SELECTED_FULL = full;
-  $("profSearch").value = PROF_FULL_TO_LABEL.get(full) || labelConfidencial(full);
-  closePanel();
-  updateProfPill();
+window.selectProf = (full)=>{
+  PROF_SELECTED_FULL = unesc(full);
+  $("profSearch").value = PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL)||PROF_SELECTED_FULL;
+  $("profHits").textContent = "";
+  refreshCascada();
   render();
-}
-function renderPanel(q){
-  const list = $("profList");
-  const title = $("profTitle");
+};
 
-  title.textContent = AC_RESULTS.length ? `Resultados (${AC_RESULTS.length})` : "Sin resultados";
-
-  if(!AC_RESULTS.length){
-    list.innerHTML = `<div class="acItem" style="cursor:default">
-      <div>
-        <div class="acName">No hay coincidencias</div>
-        <div class="acSub">Prueba con otro apellido (ej: carrillo)</div>
-      </div>
-    </div>`;
-    openPanel();
-    return;
-  }
-
-  list.innerHTML = AC_RESULTS.map((full, idx)=>{
-    const lbl = PROF_FULL_TO_LABEL.get(full) || labelConfidencial(full);
-    const sub = full; // full real, solo como referencia visual (sin DNI)
-    return `<div class="acItem" data-i="${idx}">
-      <div style="min-width:0">
-        <div class="acName">${highlight(lbl, q)}</div>
-        <div class="acSub">${highlight(sub, q)}</div>
-      </div>
-      <div class="badge" style="background:rgba(79,70,229,.08);border-color:rgba(79,70,229,.25)">Seleccionar</div>
-    </div>`;
-  }).join("");
-
-  // click en item
-  list.querySelectorAll(".acItem").forEach(el=>{
-    const i = Number(el.getAttribute("data-i"));
-    if(Number.isFinite(i)){
-      el.addEventListener("mouseenter", ()=>setActive(i));
-      el.addEventListener("click", ()=>{
-        const full = AC_RESULTS[i];
-        if(full) selectProf(full);
-      });
-    }
-  });
-
-  openPanel();
-  setActive(0);
-}
-
-/* =========================
-   ✅ EVENTS
-========================= */
+/* ══════════════════════════════════════════
+   EVENTOS BOTONES
+══════════════════════════════════════════ */
 $("btn").onclick = ()=>render();
 $("btnReset").onclick = ()=>{
   $("estab").value=""; $("tipo").value="";
   $("prest").value=""; $("modo").value="auto";
-  $("profSearch").value="";
-  PROF_SELECTED_FULL = "";
-  updateProfPill();
-  closePanel();
+  $("profSearch").value=""; $("profHits").textContent="";
+  PROF_SELECTED_FULL="";
   refreshCascada(); render();
 };
-
 $("tabPersonal").onclick = ()=>{
   $("tabPersonal").classList.add("active");
   $("tabEESS").classList.remove("active");
@@ -571,79 +576,28 @@ $("tabEESS").onclick = ()=>{
   $("cardEESS").style.display="";
   $("cardPersonal").style.display="none";
 };
-
 ["estab","tipo","modo"].forEach(id=>{
-  $(id).addEventListener("change", ()=>{ refreshCascada(); render(); });
+  $(id).addEventListener("change",()=>{ refreshCascada(); render(); });
 });
-$("prest").addEventListener("input", ()=>render());
+$("prest").addEventListener("input",()=>render());
 
-$("profClose").addEventListener("click", closePanel);
-
-// Cerrar al hacer click afuera
-document.addEventListener("click", (e)=>{
-  const ac = e.target.closest(".ac");
-  if(!ac) closePanel();
-});
-
-// teclado autocomplete
-$("profSearch").addEventListener("keydown", (e)=>{
-  if(!$("profPanel").classList.contains("open")) return;
-
-  if(e.key === "Escape"){
-    e.preventDefault();
-    closePanel();
-    return;
+$("profSearch").addEventListener("input",()=>{
+  const q=$("profSearch").value.trim().toLowerCase();
+  if(!q){
+    PROF_SELECTED_FULL="";
+    $("profHits").textContent="";
+    refreshCascada(); render(); return;
   }
-  if(e.key === "ArrowDown"){
-    e.preventDefault();
-    const next = Math.min(AC_RESULTS.length-1, AC_ACTIVE+1);
-    setActive(next);
-    return;
-  }
-  if(e.key === "ArrowUp"){
-    e.preventDefault();
-    const prev = Math.max(0, AC_ACTIVE-1);
-    setActive(prev);
-    return;
-  }
-  if(e.key === "Enter"){
-    e.preventDefault();
-    const full = AC_RESULTS[AC_ACTIVE] || AC_RESULTS[0];
-    if(full) selectProf(full);
-    return;
-  }
-});
-
-let profDebounce = null;
-$("profSearch").addEventListener("input", ()=>{
-  clearTimeout(profDebounce);
-  profDebounce = setTimeout(()=>{
-    const q = $("profSearch").value.trim().toLowerCase();
-
-    // si vacío: limpiar selección
-    if(!q){
-      PROF_SELECTED_FULL = "";
-      updateProfPill();
-      closePanel();
-      render();
-      return;
-    }
-
-    // filtrar por nombre completo o etiqueta confidencial
-    const hits = PROF_FULL_LIST.filter(full=>{
-      const lbl = (PROF_FULL_TO_LABEL.get(full)||"").toLowerCase();
-      const f   = full.toLowerCase();
-      return f.includes(q) || lbl.includes(q);
-    });
-
-    // limit (bonito y rápido)
-    AC_RESULTS = hits.slice(0, 60);
-    renderPanel(q);
-    // no auto-selecciona hasta que elija (mejor UX)
-    PROF_SELECTED_FULL = "";
-    updateProfPill();
-    render();
-  }, 120);
+  const hits = PROF_FULL_LIST
+    .filter(f=>f.toLowerCase().includes(q)||(PROF_FULL_TO_LABEL.get(f)||"").toLowerCase().includes(q))
+    .slice(0,25);
+  if(hits.length===1) PROF_SELECTED_FULL=hits[0];
+  else PROF_SELECTED_FULL="";
+  $("profHits").innerHTML = hits.map(f=>{
+    const lbl=esc(PROF_FULL_TO_LABEL.get(f)||f);
+    return `<span class="badge" style="margin:2px;cursor:pointer" onclick="selectProf('${esc(f)}')">${lbl}</span>`;
+  }).join(" ");
+  render();
 });
 
 $("btnCargarAnio").onclick = async ()=>{
@@ -653,11 +607,24 @@ $("btnCargarAnio").onclick = async ()=>{
   renderTotalesPorAnios();
 };
 
+/* ══════════════════════════════════════════
+   CARGA MANIFEST + AUTO
+══════════════════════════════════════════ */
 async function cargarManifestYAuto(){
   const r = await fetch("data/manifest.json?ts="+Date.now());
   const m = await r.json();
   MANIFEST = m;
 
+  /* ── Fechas en el header ── */
+  const ahora = new Date();
+  const pad = n=>String(n).padStart(2,"0");
+  const fechaAhora = `${pad(ahora.getDate())}/${pad(ahora.getMonth()+1)}/${ahora.getFullYear()} `
+    + `${ahora.getHours()%12||12}:${pad(ahora.getMinutes())} ${ahora.getHours()>=12?"PM":"AM"}`;
+  $("fechaActualizacion").textContent = `⏱ Actualizado: ${fechaAhora}`;
+  $("fechaDigitacion").textContent    = `Fecha de digitación al: ${formatFecha(m.generado||"")}`;
+  $("printFechaFooter").textContent   = `Actualizado: ${fechaAhora} | Digitación al: ${formatFecha(m.generado||"")}`;
+
+  /* ── Selects año/mes ── */
   const years = [...new Set(m.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
   $("anio").innerHTML = years.map(y=>`<option value="${y}">${y}</option>`).join("");
 
@@ -665,374 +632,368 @@ async function cargarManifestYAuto(){
     const y = Number($("anio").value);
     const ms = m.disponibles.filter(x=>x.anio===y).map(x=>x.mes).sort((a,b)=>a-b);
     $("mes").innerHTML = ms.map(mm=>{
-      const name = MONTHS.find(k=>k.n===mm)?.t || mm;
+      const name=MONTHS.find(k=>k.n===mm)?.t||mm;
       return `<option value="${mm}">${name}</option>`;
     }).join("");
   };
 
   $("anio").addEventListener("change", async ()=>{
     fillMes();
-    await cargarMes();
-    refreshCascada();
-    updateProfPill();
-    render();
-
-    await cargarAnio(true);
-    await cargarTotalesPorAnios(true);
-    renderAnual();
-    renderTotalesPorAnios();
+    await cargarMes(); refreshCascada(); render();
+    await cargarAnio(true); await cargarTotalesPorAnios(true);
+    renderAnual(); renderTotalesPorAnios();
   });
-
   $("mes").addEventListener("change", async ()=>{
-    await cargarMes();
-    refreshCascada();
-    updateProfPill();
-    render();
+    await cargarMes(); refreshCascada(); render();
   });
 
   $("anio").value = m.ultimo.anio;
   fillMes();
   $("mes").value = m.ultimo.mes;
 
-  await cargarMes();
-  refreshCascada();
-  updateProfPill();
-  render();
-
-  await cargarAnio();
-  await cargarTotalesPorAnios();
-  renderAnual();
-  renderTotalesPorAnios();
+  await cargarMes(); refreshCascada(); render();
+  await cargarAnio(); await cargarTotalesPorAnios();
+  renderAnual(); renderTotalesPorAnios();
 }
 
+/* ══════════════════════════════════════════
+   CARGA MES
+══════════════════════════════════════════ */
 async function cargarMes(){
-  const anio = $("anio").value;
-  const mes  = $("mes").value;
-  const file = `data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
-
-  $("estado").textContent = `Cargando ${anio}-${String(mes).padStart(2,"0")}…`;
-  const r = await fetch(file + "?ts=" + Date.now());
-  BASE = await r.json();
-
-  for(const x of BASE){
-    x.dni_prof = canonDNI(x.dni_prof); // existe en data, pero NO se muestra
-  }
-  $("estado").textContent = `Base lista: ${BASE.length} registros (${anio}-${String(mes).padStart(2,"0")})`;
+  const anio=$("anio").value, mes=$("mes").value;
+  const file=`data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
+  $("estado").textContent=`Cargando ${anio}-${String(mes).padStart(2,"0")}…`;
+  const r=await fetch(file+"?ts="+Date.now());
+  BASE=await r.json();
+  for(const x of BASE) x.dni_prof=canonDNI(x.dni_prof);
+  $("estado").textContent=`Base lista: ${BASE.length.toLocaleString()} registros (${anio}-${String(mes).padStart(2,"0")})`;
 }
 
-/* ====== CARGA ANUAL ====== */
+/* ══════════════════════════════════════════
+   CARGA ANUAL
+══════════════════════════════════════════ */
 async function cargarAnio(forzar=false){
   if(!MANIFEST) return;
-
-  const anio = Number($("anio").value);
+  const anio=Number($("anio").value);
   if(!forzar && YEAR_CACHE.has(anio)) return;
-
-  $("estado").textContent = `Cargando año ${anio} (sumando meses)…`;
-
-  const meses = MANIFEST.disponibles
-    .filter(x=>x.anio===anio)
-    .map(x=>x.mes)
-    .sort((a,b)=>a-b);
-
-  const totPorMes = {};
+  $("estado").textContent=`Cargando año ${anio}…`;
+  const meses=MANIFEST.disponibles.filter(x=>x.anio===anio).map(x=>x.mes).sort((a,b)=>a-b);
+  const tot={};
   for(const mes of meses){
-    const file = `data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
-    try{
-      const r = await fetch(file + "?ts=" + Date.now());
-      const data = await r.json();
-      totPorMes[mes] = Array.isArray(data) ? data.length : 0;
-    }catch(e){
-      totPorMes[mes] = 0;
-    }
+    const file=`data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
+    try{ const r=await fetch(file+"?ts="+Date.now()); const d=await r.json(); tot[mes]=Array.isArray(d)?d.length:0; }
+    catch(e){ tot[mes]=0; }
   }
-
-  YEAR_CACHE.set(anio, totPorMes);
-  $("estado").textContent = `Año ${anio} cargado (meses: ${meses.length})`;
+  YEAR_CACHE.set(anio,tot);
+  $("estado").textContent=`Año ${anio} cargado`;
 }
 
 function renderAnual(){
-  const anio = Number($("anio").value);
-  const totPorMes = YEAR_CACHE.get(anio) || {};
-
-  const labels = MONTHS.map(m=>m.t);
-  const dataMes = MONTHS.map(m=> Number(totPorMes[m.n] || 0));
-
-  const totalAnual = dataMes.reduce((a,b)=>a+b,0);
-  $("kpiAnual").textContent = `Total anual ${anio}: ${totalAnual.toLocaleString()}`;
-
+  const anio=Number($("anio").value);
+  const tot=YEAR_CACHE.get(anio)||{};
+  const labels=MONTHS.map(m=>m.t);
+  const data=MONTHS.map(m=>Number(tot[m.n]||0));
+  const total=data.reduce((a,b)=>a+b,0);
+  $("kpiAnual").textContent=`Total anual ${anio}: ${total.toLocaleString()}`;
   if(chartAnioMes) chartAnioMes.destroy();
-  chartAnioMes = new Chart($("c_anio_mes"), {
+  chartAnioMes=new Chart($("c_anio_mes"),{
     type:"bar",
-    data:{ labels, datasets:[{ label:"Registros", data:dataMes }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+    data:{ labels, datasets:[{ label:"Registros", data,
+      backgroundColor: data.map((_,i)=>`rgba(30,64,175,${0.55+0.45*(i/11)})`),
+      borderRadius:5, borderSkipped:false
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#f1f5f9"}} }
+    }
   });
 }
 
-/* ====== TOTALES POR AÑO ====== */
+/* ══════════════════════════════════════════
+   TOTALES POR AÑO
+══════════════════════════════════════════ */
 async function cargarTotalesPorAnios(forzar=false){
   if(!MANIFEST) return;
-
-  const years = [...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
-
-  if(!forzar){
-    let ok = true;
-    for(const y of years){ if(!YEARS_TOTAL_CACHE.has(y)) { ok=false; break; } }
-    if(ok) return;
-  }
-
-  $("estado").textContent = `Cargando totales por año…`;
-
+  const years=[...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
+  if(!forzar){ let ok=true; for(const y of years) if(!YEARS_TOTAL_CACHE.has(y)){ok=false;break;} if(ok) return; }
+  $("estado").textContent="Cargando totales por año…";
   for(const y of years){
     if(!forzar && YEARS_TOTAL_CACHE.has(y)) continue;
-
-    const meses = MANIFEST.disponibles
-      .filter(x=>x.anio===y)
-      .map(x=>x.mes)
-      .sort((a,b)=>a-b);
-
-    let total = 0;
+    const meses=MANIFEST.disponibles.filter(x=>x.anio===y).map(x=>x.mes);
+    let total=0;
     for(const mes of meses){
-      const file = `data/base_${y}_${String(mes).padStart(2,"0")}.json`;
-      try{
-        const r = await fetch(file + "?ts=" + Date.now());
-        const data = await r.json();
-        total += Array.isArray(data) ? data.length : 0;
-      }catch(e){}
+      const file=`data/base_${y}_${String(mes).padStart(2,"0")}.json`;
+      try{ const r=await fetch(file+"?ts="+Date.now()); const d=await r.json(); total+=Array.isArray(d)?d.length:0; }catch(e){}
     }
-
-    YEARS_TOTAL_CACHE.set(y, total);
+    YEARS_TOTAL_CACHE.set(y,total);
   }
-
-  $("estado").textContent = `Totales por año listos`;
+  $("estado").textContent="Totales por año listos";
 }
 
 function renderTotalesPorAnios(){
   if(!MANIFEST) return;
-
-  const years = [...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
-  const labels = years.map(String);
-  const data = years.map(y => Number(YEARS_TOTAL_CACHE.get(y) || 0));
-
+  const years=[...new Set(MANIFEST.disponibles.map(x=>x.anio))].sort((a,b)=>a-b);
+  const labels=years.map(String);
+  const data=years.map(y=>Number(YEARS_TOTAL_CACHE.get(y)||0));
   if(chartYearsTotal) chartYearsTotal.destroy();
-
-  chartYearsTotal = new Chart($("c_years_total"), {
+  chartYearsTotal=new Chart($("c_years_total"),{
     type:"bar",
-    data:{ labels, datasets:[{ label:"Total anual", data }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+    data:{ labels, datasets:[{ label:"Total anual", data,
+      backgroundColor:["#0891b2","#1e40af","#7c3aed","#059669"].slice(0,years.length),
+      borderRadius:6, borderSkipped:false
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#f1f5f9"}} }
+    }
   });
 }
 
-/* ====== Cascada (sin DNI visible) ====== */
+/* ══════════════════════════════════════════
+   CASCADA (sin DNI)
+══════════════════════════════════════════ */
 function refreshCascada(){
-  const estabSel = unesc($("estab").value);
-  const tipoSel  = unesc($("tipo").value);
-
-  let d = BASE;
-  if(estabSel) d = d.filter(x=>x.establecimiento===estabSel);
-  if(tipoSel)  d = d.filter(x=>x.tipo_profesional===tipoSel);
-
-  const estabs = [...new Set(d.map(x=>x.establecimiento).filter(Boolean))].sort();
-  const tipos  = [...new Set(d.map(x=>x.tipo_profesional).filter(Boolean))].sort();
-
-  $("estab").innerHTML = `<option value="">Todos</option>` + estabs.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join("");
-  $("tipo").innerHTML  = `<option value="">Todos</option>` + tipos.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");
-
-  // profesionales
-  const profSet = new Set(d.map(x=>x.profesional).filter(Boolean));
-  PROF_FULL_LIST = [...profSet].sort((a,b)=>a.localeCompare(b,"es"));
-
-  PROF_FULL_TO_LABEL.clear();
+  const estabSel=unesc($("estab").value);
+  const tipoSel=unesc($("tipo").value);
+  let d=BASE;
+  if(estabSel) d=d.filter(x=>x.establecimiento===estabSel);
+  if(tipoSel)  d=d.filter(x=>x.tipo_profesional===tipoSel);
+  const estabs=[...new Set(d.map(x=>x.establecimiento).filter(Boolean))].sort();
+  const tipos=[...new Set(d.map(x=>x.tipo_profesional).filter(Boolean))].sort();
+  $("estab").innerHTML=`<option value="">Todos</option>`+estabs.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join("");
+  $("tipo").innerHTML=`<option value="">Todos</option>`+tipos.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");
+  const profSet=new Set(d.map(x=>x.profesional).filter(Boolean));
+  PROF_FULL_LIST=[...profSet].sort((a,b)=>a.localeCompare(b,"es"));
+  PROF_FULL_TO_LABEL.clear(); PROF_LABEL_TO_FULL.clear();
   for(const full of PROF_FULL_LIST){
-    PROF_FULL_TO_LABEL.set(full, labelConfidencial(full));
+    const lbl=labelConfidencial(full);
+    PROF_FULL_TO_LABEL.set(full,lbl);
+    if(!PROF_LABEL_TO_FULL.has(lbl)) PROF_LABEL_TO_FULL.set(lbl,full);
   }
-
-  if(estabSel) $("estab").value = esc(estabSel);
-  if(tipoSel)  $("tipo").value  = esc(tipoSel);
+  if(estabSel) $("estab").value=esc(estabSel);
+  if(tipoSel)  $("tipo").value=esc(tipoSel);
 }
 
+/* ══════════════════════════════════════════
+   FILTROS TEXTO (para impresión)
+══════════════════════════════════════════ */
 function filtrosTexto(){
-  const anio = $("anio").value;
-  const mes  = $("mes").value;
-  const mesName = MONTHS.find(x=>String(x.n)===String(mes))?.t || mes;
-  const estab = $("estab").value ? `EESS: ${unesc($("estab").value)}` : "EESS: Todos";
-  const tipo  = $("tipo").value ? `Tipo: ${unesc($("tipo").value)}` : "Tipo: Todos";
-  const prest = $("prest").value.trim() ? `Prestación: ${$("prest").value.trim()}` : "Prestación: -";
-
-  const profLabel = PROF_SELECTED_FULL
-    ? `Profesional: ${PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL) || labelConfidencial(PROF_SELECTED_FULL)}`
-    : "Profesional: Todos";
-
-  return `Periodo: ${anio} - ${mesName} | ${estab} | ${tipo} | ${profLabel} | ${prest}`;
+  const anio=$("anio").value, mes=$("mes").value;
+  const mesName=MONTHS.find(x=>String(x.n)===String(mes))?.t||mes;
+  const estab=$("estab").value?`EESS: ${unesc($("estab").value)}`:"EESS: Todos";
+  const tipo=$("tipo").value?`Tipo: ${unesc($("tipo").value)}`:"Tipo: Todos";
+  const prest=$("prest").value.trim()?`Prestación: ${$("prest").value.trim()}`:"Prestación: —";
+  const profLabel=PROF_SELECTED_FULL
+    ?`Profesional: ${PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL)||labelConfidencial(PROF_SELECTED_FULL)}`
+    :"Profesional: Todos";
+  return `Periodo: ${anio} — ${mesName}  |  ${estab}  |  ${tipo}  |  ${profLabel}  |  ${prest}`;
 }
 
 function aplicarFiltros(){
-  const estab = unesc($("estab").value);
-  const tipo  = unesc($("tipo").value);
-  const prest = $("prest").value.trim().toLowerCase();
-
-  let d = BASE;
-  if(estab) d = d.filter(x=>x.establecimiento===estab);
-  if(tipo)  d = d.filter(x=>x.tipo_profesional===tipo);
-
-  if(PROF_SELECTED_FULL) d = d.filter(x=>x.profesional===PROF_SELECTED_FULL);
-
-  if(prest){
-    d = d.filter(x=>{
-      const s = String(x.servicio||"").toLowerCase();
-      const id = String(x.id_servicio||"").toLowerCase();
-      return s.includes(prest) || id.includes(prest);
-    });
-  }
+  const estab=unesc($("estab").value);
+  const tipo=unesc($("tipo").value);
+  const prest=$("prest").value.trim().toLowerCase();
+  let d=BASE;
+  if(estab) d=d.filter(x=>x.establecimiento===estab);
+  if(tipo)  d=d.filter(x=>x.tipo_profesional===tipo);
+  const profFull=(PROF_SELECTED_FULL||"").trim();
+  if(profFull) d=d.filter(x=>x.profesional===profFull);
+  if(prest) d=d.filter(x=>String(x.servicio||"").toLowerCase().includes(prest)||String(x.id_servicio||"").toLowerCase().includes(prest));
   return d;
 }
 
+/* ══════════════════════════════════════════
+   RENDER PRINCIPAL
+══════════════════════════════════════════ */
 function render(){
   if(!BASE.length) return;
-  $("printSub").textContent = filtrosTexto();
-
-  const d = aplicarFiltros();
-  const anio = $("anio").value;
-  const mes = $("mes").value;
-  const nDias = diasEnMes(anio, mes);
-
-  renderMatrizPersonal(d, nDias);
-  renderMatrizEESS(d, nDias);
+  $("printSub").textContent=filtrosTexto();
+  $("printFechas").textContent=$("fechaActualizacion").textContent+" | "+$("fechaDigitacion").textContent;
+  const d=aplicarFiltros();
+  const anio=$("anio").value, mes=$("mes").value;
+  const nDias=diasEnMes(anio,mes);
+  actualizarKPIs(d, nDias);
+  renderMatrizPersonal(d,nDias);
+  renderMatrizEESS(d,nDias);
   renderCharts(d);
 }
 
-function renderMatrizPersonal(d, nDias){
-  const days = Array.from({length:nDias},(_,i)=>i+1);
-  const modo = $("modo").value;
+/* ── KPIs dinámicos ── */
+function actualizarKPIs(d, nDias){
+  $("kpiTotal").textContent  = d.length.toLocaleString();
+  $("kpiProfs").textContent  = new Set(d.map(x=>x.profesional).filter(Boolean)).size.toLocaleString();
+  $("kpiEESS").textContent   = new Set(d.map(x=>x.establecimiento).filter(Boolean)).size.toLocaleString();
+  const prom = nDias>0 ? Math.round(d.length/nDias) : 0;
+  $("kpiProm").textContent   = prom.toLocaleString();
+}
 
-  const map = new Map();
+/* ══════════════════════════════════════════
+   MATRIZ PERSONAL con heatmap
+══════════════════════════════════════════ */
+function renderMatrizPersonal(d, nDias){
+  const days=Array.from({length:nDias},(_,i)=>i+1);
+  const modo=$("modo").value;
+  const map=new Map();
+
   function makeKey(r){
-    const e = r.establecimiento || "SIN EESS";
-    const p = r.profesional || "SIN PROFESIONAL";
-    const t = r.tipo_profesional || "SIN TIPO";
-    if(modo === "resumen") return ["__ALL__", p, t].join("||");
-    return [e, p, t].join("||");
+    const e=r.establecimiento||"SIN EESS";
+    const p=r.profesional||"SIN PROFESIONAL";
+    const t=r.tipo_profesional||"SIN TIPO";
+    if(modo==="resumen") return ["__ALL__",p,t].join("||");
+    return [e,p,t].join("||");
   }
 
   for(const r of d){
-    const k = makeKey(r);
-    if(!map.has(k)){
-      map.set(k, {
-        establecimiento: (modo==="resumen") ? "TODOS" : (r.establecimiento||"SIN EESS"),
-        profesional: r.profesional||"SIN PROFESIONAL",
-        profesion: r.tipo_profesional||"SIN TIPO",
-        d: Object.fromEntries(days.map(x=>[x,0])),
-        total:0
-      });
-    }
-    const obj = map.get(k);
-    const dia = Number(r.dia)||0;
-    if(dia>=1 && dia<=nDias){
-      obj.d[dia] += 1;
-      obj.total += 1;
-    }
+    const k=makeKey(r);
+    if(!map.has(k)) map.set(k,{
+      establecimiento:(modo==="resumen")?"TODOS":(r.establecimiento||"SIN EESS"),
+      profesional:r.profesional||"SIN PROFESIONAL",
+      profesion:r.tipo_profesional||"SIN TIPO",
+      dd:Object.fromEntries(days.map(x=>[x,0])),
+      total:0
+    });
+    const obj=map.get(k);
+    const dia=Number(r.dia)||0;
+    if(dia>=1&&dia<=nDias){ obj.dd[dia]+=1; obj.total+=1; }
   }
 
-  const rows = [...map.values()].sort((a,b)=>b.total-a.total);
+  const rows=[...map.values()].sort((a,b)=>b.total-a.total);
 
-  let html = `<tr>
+  /* umbral heatmap */
+  const allVals=rows.flatMap(r=>days.map(d=>r.dd[d]||0)).filter(v=>v>0);
+  const maxVal=allVals.length?Math.max(...allVals):1;
+  const medVal=maxVal*0.45;
+  const lowVal=maxVal*0.1;
+
+  function cellClass(v){
+    if(!v) return "";
+    if(v>=medVal) return "c-hot";
+    if(v>=lowVal) return "c-med";
+    return "c-low";
+  }
+
+  let html=`<tr>
     <th class="left">ESTABLECIMIENTO</th>
     <th class="left">PERSONAL (CONFIDENCIAL)</th>
     <th class="left">PROFESIÓN</th>
     ${days.map(x=>`<th>${x}</th>`).join("")}
-    <th>Total</th>
+    <th class="th-total">TOTAL</th>
   </tr>`;
 
   for(const r of rows){
-    html += `<tr>
-      <td class="left">${esc(r.establecimiento)}</td>
-      <td class="left">${esc(labelConfidencial(r.profesional))}</td>
-      <td class="left">${esc(r.profesion)}</td>
-      ${days.map(dy=>`<td>${r.d[dy]||0}</td>`).join("")}
-      <td><b>${r.total}</b></td>
+    html+=`<tr>
+      <td class="td-eess">${esc(r.establecimiento)}</td>
+      <td class="td-prof">${esc(labelConfidencial(r.profesional))}</td>
+      <td class="td-prof-tipo">${esc(r.profesion)}</td>
+      ${days.map(dy=>{
+        const v=r.dd[dy]||0;
+        const cls=cellClass(v);
+        return `<td${cls?` class="${cls}"`:""}>${v||""}</td>`;
+      }).join("")}
+      <td class="td-total">${r.total}</td>
     </tr>`;
   }
 
-  $("matrizPersonal").innerHTML = html;
+  $("matrizPersonal").innerHTML=html;
 }
 
-function renderMatrizEESS(d, nDias){
-  const days = Array.from({length:nDias},(_,i)=>i+1);
-  const map = new Map();
-
+/* ══════════════════════════════════════════
+   MATRIZ EESS
+══════════════════════════════════════════ */
+function renderMatrizEESS(d,nDias){
+  const days=Array.from({length:nDias},(_,i)=>i+1);
+  const map=new Map();
   for(const r of d){
-    const k = r.establecimiento || "SIN EESS";
-    if(!map.has(k)) map.set(k, {d:Object.fromEntries(days.map(x=>[x,0])), total:0});
-    const obj = map.get(k);
-    const dia = Number(r.dia)||0;
-    if(dia>=1 && dia<=nDias){
-      obj.d[dia] += 1;
-      obj.total += 1;
-    }
+    const k=r.establecimiento||"SIN EESS";
+    if(!map.has(k)) map.set(k,{dd:Object.fromEntries(days.map(x=>[x,0])),total:0});
+    const obj=map.get(k);
+    const dia=Number(r.dia)||0;
+    if(dia>=1&&dia<=nDias){ obj.dd[dia]+=1; obj.total+=1; }
   }
-
-  const rows = [...map.entries()].map(([k,v])=>({k, ...v})).sort((a,b)=>b.total-a.total);
-
-  let html = `<tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th>Total</th></tr>`;
+  const rows=[...map.entries()].map(([k,v])=>({k,...v})).sort((a,b)=>b.total-a.total);
+  let html=`<tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr>`;
   for(const r of rows){
-    html += `<tr>
-      <td class="left">${esc(r.k)}</td>
-      ${days.map(dy=>`<td>${r.d[dy]||0}</td>`).join("")}
-      <td><b>${r.total}</b></td>
+    html+=`<tr>
+      <td class="td-eess">${esc(r.k)}</td>
+      ${days.map(dy=>`<td>${r.dd[dy]||""}</td>`).join("")}
+      <td class="td-total">${r.total}</td>
     </tr>`;
   }
-  $("matrizEESS").innerHTML = html;
+  $("matrizEESS").innerHTML=html;
 }
 
+/* ══════════════════════════════════════════
+   GRÁFICOS con colores custom
+══════════════════════════════════════════ */
 function renderCharts(d){
-  const eCount = new Map();
+  /* EESS */
+  const eCount=new Map();
   for(const x of d){
-    const k = x.establecimiento || "";
-    if(!k) continue;
-    eCount.set(k, (eCount.get(k)||0)+1);
+    const k=x.establecimiento||""; if(!k) continue;
+    eCount.set(k,(eCount.get(k)||0)+1);
   }
-  const topE = [...eCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
-  const eLabels = topE.map(x=>x[0]);
-  const eData   = topE.map(x=>x[1]);
+  const topE=[...eCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
 
-  const tCount = new Map();
+  /* Tipo profesional */
+  const tCount=new Map();
   for(const x of d){
-    const k = x.tipo_profesional || "SIN DATO";
-    tCount.set(k, (tCount.get(k)||0)+1);
+    const k=x.tipo_profesional||"SIN DATO";
+    tCount.set(k,(tCount.get(k)||0)+1);
   }
-  const tArr = [...tCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const tLabels = tArr.map(x=>x[0]);
-  const tData   = tArr.map(x=>x[1]);
+  const tArr=[...tCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
 
   if(chartEESS) chartEESS.destroy();
-  if(chartTipo) chartTipo.destroy();
+  if(chartTipo)  chartTipo.destroy();
 
-  chartEESS = new Chart($("c_eess"), {
+  chartEESS=new Chart($("c_eess"),{
     type:"bar",
-    data:{ labels:eLabels, datasets:[{ label:"Registros", data:eData }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+    data:{ labels:topE.map(x=>x[0]), datasets:[{
+      label:"Registros", data:topE.map(x=>x[1]),
+      backgroundColor: topE.map((_,i)=>{
+        const alpha=0.55+0.45*(i===0?1:(1-i/topE.length));
+        return `rgba(30,64,175,${alpha.toFixed(2)})`;
+      }),
+      borderRadius:5, borderSkipped:false
+    }]},
+    options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{color:"#f1f5f9"}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
+    }
   });
 
-  chartTipo = new Chart($("c_tipo"), {
+  chartTipo=new Chart($("c_tipo"),{
     type:"doughnut",
-    data:{ labels:tLabels, datasets:[{ data:tData }] },
-    options:{ responsive:true, maintainAspectRatio:false }
+    data:{ labels:tArr.map(x=>x[0]), datasets:[{
+      data:tArr.map(x=>x[1]),
+      backgroundColor:PALETTE.slice(0,tArr.length),
+      borderWidth:2, borderColor:"#fff", hoverOffset:6
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:"right",labels:{font:{size:10},boxWidth:12,padding:8}} }
+    }
   });
 }
 
-/* ✅ Antes de imprimir: “foto” de los gráficos anuales */
-function snapChartToImg(canvasId, imgId){
-  const c = document.getElementById(canvasId);
-  const img = document.getElementById(imgId);
-  if(!c || !img) return;
-  try{ img.src = c.toDataURL("image/png", 1.0); }catch(e){}
+/* ══════════════════════════════════════════
+   IMPRESIÓN — captura gráficos anuales
+══════════════════════════════════════════ */
+function snapChartToImg(cId,iId){
+  const c=document.getElementById(cId), img=document.getElementById(iId);
+  if(!c||!img) return;
+  try{ img.src=c.toDataURL("image/png",1.0); }catch(e){}
 }
-window.addEventListener("beforeprint", ()=>{
+window.addEventListener("beforeprint",()=>{
   snapChartToImg("c_anio_mes","img_c_anio_mes");
   snapChartToImg("c_years_total","img_c_years_total");
 });
 
+/* ══════════════════════════════════════════
+   INICIO
+══════════════════════════════════════════ */
 cargarManifestYAuto();
 </script>
+</body>
+</html>
 </body>
 </html>
 
