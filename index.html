@@ -122,6 +122,8 @@
     gap:10px;
     margin-bottom:12px;
   }
+  #kpiCards2{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:900px){ .kpis{grid-template-columns:repeat(2,1fr)} }
   .kpi{
     background:var(--blanco);
     border:1px solid var(--borde);
@@ -132,9 +134,28 @@
   .kpi.k2{border-top-color:var(--cian)}
   .kpi.k3{border-top-color:var(--verde)}
   .kpi.k4{border-top-color:var(--morado)}
+  .kpi.k5{border-top-color:var(--verde)}
+  .kpi.k6{border-top-color:#dc2626}
+  .kpi.k7{border-top-color:var(--azul3)}
   .kpi .klabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
   .kpi .kval{font-size:28px;font-weight:800;color:var(--texto);line-height:1}
   .kpi .ksub{font-size:11px;color:var(--muted);margin-top:5px}
+
+  /* ══════════════════════════════
+     CUMPLIMIENTO / ALERTAS / TENDENCIA
+  ══════════════════════════════ */
+  .badge-cumpl{
+    display:inline-flex;align-items:center;justify-content:center;gap:3px;
+    padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;
+  }
+  .badge-ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+  .badge-warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+  .badge-bad{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+  .badge-neutral{background:#f1f5f9;color:#64748b;border:1px solid var(--borde)}
+
+  .tendencia-up{color:#059669;font-weight:700}
+  .tendencia-down{color:#dc2626;font-weight:700}
+  .tendencia-flat{color:#94a3b8;font-weight:600}
 
   /* ══════════════════════════════
      FILTROS
@@ -247,8 +268,12 @@
   .c-hot{background:#1e40af !important;color:#fff !important;font-weight:700;border-radius:3px}
   .c-med{background:#bfdbfe !important;color:#1e3a8a !important;font-weight:600;border-radius:3px}
   .c-low{background:#f0f9ff !important;color:#0369a1 !important}
+  .c-alert{
+    background:#fecaca !important;color:#7f1d1d !important;font-weight:800;
+    border-radius:3px;box-shadow:inset 0 0 0 1.5px #dc2626;
+  }
 
-  .leyenda{display:flex;gap:14px;margin-top:8px;font-size:10px;color:var(--muted)}
+  .leyenda{display:flex;gap:14px;margin-top:8px;font-size:10px;color:var(--muted);flex-wrap:wrap}
   .leyenda span{display:flex;align-items:center;gap:5px}
   .leyenda-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
 
@@ -258,6 +283,7 @@
   #printHeader,#printFooter{display:none}
 
   @media print{
+    @page{ size:A4 landscape; margin:9mm 8mm; }
     body{background:#fff}
     header,.no-print{display:none !important}
     .card{margin:0 0 8px 0;box-shadow:none;background:#fff;border:1px solid #e5e7eb;border-radius:6px}
@@ -266,27 +292,37 @@
 
     #printHeader{
       display:flex !important;gap:12px;align-items:center;
-      margin-bottom:10px;padding-bottom:8px;
+      margin-bottom:8px;padding-bottom:8px;
       border-bottom:2px solid #1e40af;
     }
-    #printHeader img{height:52px}
-    #printTitle{margin:0;font-size:17px;font-weight:800;color:#1e40af}
-    #printSub{font-size:11px;color:#374151;margin-top:3px}
-    #printFechas{font-size:10px;color:#64748b;margin-top:2px}
+    #printHeader img{height:46px}
+    #printTitle{margin:0;font-size:16px;font-weight:800;color:#1e40af;letter-spacing:.2px}
+    #printSub{font-size:10.5px;color:#374151;margin-top:3px;font-weight:600}
+    #printFechas{font-size:9.5px;color:#64748b;margin-top:2px}
+    #printKPIs span{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
     #printFooter{
       display:block !important;
-      margin-top:10px;padding-top:8px;
+      margin-top:8px;padding-top:6px;
       border-top:1px solid #e5e7eb;
-      font-size:10px;color:#64748b;text-align:center;
+      font-size:9.5px;color:#64748b;text-align:center;
     }
 
     #img_c_anio_mes,#img_c_years_total{display:block !important}
     #c_anio_mes,#c_years_total{display:none !important}
 
+    /* Repetir encabezado de tabla en cada página + no partir filas */
+    table{font-size:9.5px}
+    thead{display:table-header-group}
+    tbody{display:table-row-group}
+    tr{page-break-inside:avoid;break-inside:avoid}
+
     th{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    th.th-total{background:#1e3a8a !important}
     .c-hot{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .c-med{background:#bfdbfe !important;color:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .c-alert{background:#fecaca !important;color:#7f1d1d !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .badge-ok,.badge-warn,.badge-bad,.badge-neutral{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .kpi{border-top-width:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
@@ -330,6 +366,7 @@
       <p id="printTitle">PRODUCCIÓN DEL PERSONAL DE SALUD — USPP CHUPACA</p>
       <div id="printSub"></div>
       <div id="printFechas"></div>
+      <div id="printKPIs" style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
   </div>
 
@@ -354,6 +391,24 @@
       <div class="klabel">Promedio diario</div>
       <div class="kval" id="kpiProm">—</div>
       <div class="ksub">Registros / día</div>
+    </div>
+  </div>
+
+  <div class="kpis no-print" id="kpiCards2">
+    <div class="kpi k5">
+      <div class="klabel">Cumplimiento promedio</div>
+      <div class="kval" id="kpiCumplimiento">—</div>
+      <div class="ksub">Vs. estándar FUAS/día por profesión</div>
+    </div>
+    <div class="kpi k6">
+      <div class="klabel">Alertas de sobreproducción</div>
+      <div class="kval" id="kpiAlertas">—</div>
+      <div class="ksub">Días con FUAS &gt; estándar</div>
+    </div>
+    <div class="kpi k7">
+      <div class="klabel">Tendencia vs. mes anterior</div>
+      <div class="kval" id="kpiTendencia">—</div>
+      <div class="ksub" id="kpiTendenciaSub">Total de registros</div>
     </div>
   </div>
 
@@ -461,6 +516,15 @@
       <span><span class="leyenda-dot" style="background:#1e40af"></span> Alta producción</span>
       <span><span class="leyenda-dot" style="background:#bfdbfe"></span> Media producción</span>
       <span><span class="leyenda-dot" style="background:#f0f9ff"></span> Baja producción</span>
+      <span><span class="leyenda-dot" style="background:#dc2626"></span> Alerta: día con FUAS &gt; estándar</span>
+      <span><span class="leyenda-dot" style="background:#059669"></span> Cumplimiento ≥70% y ≤110%</span>
+      <span><span class="leyenda-dot" style="background:#d97706"></span> Cumplimiento &lt;70%</span>
+    </div>
+    <div class="muted" style="margin-top:6px">
+      Estándar de referencia (FUAS máx./día por profesión): Médico 60 · Odontólogo 50 · Enfermera 50 · Obstetra 50 ·
+      Técnico de Enfermería 50 · Nutricionista 40 · Psicólogo 24 · Trabajadora Social 40.
+      <b>Nota:</b> Enfermera y Obstetra tenían dos valores (50 y 40) en la tabla original; se unificaron en <b>50</b>.
+      Si corresponde el valor de 40, cámbialo en <code>ESTANDARES_FUA</code> dentro del código (una sola línea por profesión).
     </div>
   </div>
 
@@ -482,6 +546,7 @@
    ESTADO GLOBAL
 ══════════════════════════════════════════ */
 let BASE = [];
+let PREV_BASE = []; // base del mes anterior (para tendencia)
 let MANIFEST = null;
 let chartEESS=null, chartTipo=null, chartAnioMes=null, chartYearsTotal=null;
 const YEAR_CACHE       = new Map();
@@ -500,6 +565,41 @@ const PALETTE = [
   "#b45309","#be185d","#0e7490","#065f46",
   "#4338ca","#c2410c","#0369a1","#6d28d9"
 ];
+
+/* ══════════════════════════════════════════
+   ESTÁNDARES DE PRODUCCIÓN (FUAS máx./día/persona)
+   Editable: cambia el número si tu norma real difiere.
+   Nota: en la tabla original, ENFERMERA y OBSTETRA aparecían
+   con 50 y con 40 → se unificaron aquí en 50 (a pedido).
+══════════════════════════════════════════ */
+const ESTANDARES_FUA = {
+  "MEDICO":                 60,
+  "ODONTOLOGO":             50,
+  "ENFERMERA":              50,
+  "OBSTETRA":               50,
+  "TECNICO DE ENFERMERIA":  50,
+  "NUTRICIONISTA":          40,
+  "PSICOLOGO":              24,
+  "TRABAJADORA SOCIAL":     40
+};
+/* Umbrales para el semáforo de % de cumplimiento */
+const UMBRAL_ALTO = 110; // por encima de esto: posible sobreproducción / error
+const UMBRAL_BAJO = 70;  // por debajo de esto: bajo el estándar
+
+function normTipo(t){
+  return String(t||"")
+    .toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"") // quita tildes
+    .replace(/\s+/g," ")
+    .trim();
+}
+const ESTANDARES_NORM = new Map(
+  Object.entries(ESTANDARES_FUA).map(([k,v])=>[normTipo(k),v])
+);
+function getEstandar(tipoProfesional){
+  const k = normTipo(tipoProfesional);
+  return ESTANDARES_NORM.has(k) ? ESTANDARES_NORM.get(k) : null;
+}
 
 /* ══════════════════════════════════════════
    HELPERS
@@ -639,19 +739,19 @@ async function cargarManifestYAuto(){
 
   $("anio").addEventListener("change", async ()=>{
     fillMes();
-    await cargarMes(); refreshCascada(); render();
+    await cargarMes(); await cargarMesAnterior(); refreshCascada(); render();
     await cargarAnio(true); await cargarTotalesPorAnios(true);
     renderAnual(); renderTotalesPorAnios();
   });
   $("mes").addEventListener("change", async ()=>{
-    await cargarMes(); refreshCascada(); render();
+    await cargarMes(); await cargarMesAnterior(); refreshCascada(); render();
   });
 
   $("anio").value = m.ultimo.anio;
   fillMes();
   $("mes").value = m.ultimo.mes;
 
-  await cargarMes(); refreshCascada(); render();
+  await cargarMes(); await cargarMesAnterior(); refreshCascada(); render();
   await cargarAnio(); await cargarTotalesPorAnios();
   renderAnual(); renderTotalesPorAnios();
 }
@@ -667,6 +767,26 @@ async function cargarMes(){
   BASE=await r.json();
   for(const x of BASE) x.dni_prof=canonDNI(x.dni_prof);
   $("estado").textContent=`Base lista: ${BASE.length.toLocaleString()} registros (${anio}-${String(mes).padStart(2,"0")})`;
+}
+
+/* ══════════════════════════════════════════
+   CARGA MES ANTERIOR (para tendencia)
+══════════════════════════════════════════ */
+async function cargarMesAnterior(){
+  PREV_BASE = [];
+  if(!MANIFEST) return;
+  let anio=Number($("anio").value), mes=Number($("mes").value);
+  mes -= 1;
+  if(mes<1){ mes=12; anio-=1; }
+  const existe = MANIFEST.disponibles.some(x=>x.anio===anio && x.mes===mes);
+  if(!existe) return;
+  const file=`data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
+  try{
+    const r=await fetch(file+"?ts="+Date.now());
+    const d=await r.json();
+    for(const x of d) x.dni_prof=canonDNI(x.dni_prof);
+    PREV_BASE = Array.isArray(d) ? d : [];
+  }catch(e){ PREV_BASE = []; }
 }
 
 /* ══════════════════════════════════════════
@@ -789,17 +909,29 @@ function filtrosTexto(){
   return `Periodo: ${anio} — ${mesName}  |  ${estab}  |  ${tipo}  |  ${profLabel}  |  ${prest}`;
 }
 
-function aplicarFiltros(){
+function aplicarFiltrosA(dataset){
   const estab=unesc($("estab").value);
   const tipo=unesc($("tipo").value);
   const prest=$("prest").value.trim().toLowerCase();
-  let d=BASE;
+  let d=dataset;
   if(estab) d=d.filter(x=>x.establecimiento===estab);
   if(tipo)  d=d.filter(x=>x.tipo_profesional===tipo);
   const profFull=(PROF_SELECTED_FULL||"").trim();
   if(profFull) d=d.filter(x=>x.profesional===profFull);
   if(prest) d=d.filter(x=>String(x.servicio||"").toLowerCase().includes(prest)||String(x.id_servicio||"").toLowerCase().includes(prest));
   return d;
+}
+function aplicarFiltros(){ return aplicarFiltrosA(BASE); }
+
+/* Tendencia global (total filtrado actual vs. mismo filtro en el mes anterior) */
+function calcularTendenciaGlobal(dFiltradoActual){
+  if(!PREV_BASE.length) return null;
+  const prevFiltrado = aplicarFiltrosA(PREV_BASE);
+  const prevTotal = prevFiltrado.length;
+  if(prevTotal===0) return null;
+  const delta = dFiltradoActual.length - prevTotal;
+  const pct = Math.round((delta/prevTotal)*100);
+  return {delta,pct,prevTotal};
 }
 
 /* ══════════════════════════════════════════
@@ -813,7 +945,8 @@ function render(){
   const anio=$("anio").value, mes=$("mes").value;
   const nDias=diasEnMes(anio,mes);
   actualizarKPIs(d, nDias);
-  renderMatrizPersonal(d,nDias);
+  const stats=renderMatrizPersonal(d,nDias);
+  actualizarKPIsCumplimiento(stats, d);
   renderMatrizEESS(d,nDias);
   renderCharts(d);
 }
@@ -825,6 +958,25 @@ function actualizarKPIs(d, nDias){
   $("kpiEESS").textContent   = new Set(d.map(x=>x.establecimiento).filter(Boolean)).size.toLocaleString();
   const prom = nDias>0 ? Math.round(d.length/nDias) : 0;
   $("kpiProm").textContent   = prom.toLocaleString();
+}
+
+/* ── KPIs de cumplimiento / alertas / tendencia ── */
+function actualizarKPIsCumplimiento(stats, dFiltrado){
+  $("kpiCumplimiento").textContent = stats.cumplPromedio!=null ? stats.cumplPromedio+"%" : "—";
+  $("kpiAlertas").textContent = stats.alertas.toLocaleString();
+
+  const tend = calcularTendenciaGlobal(dFiltrado);
+  const elVal = $("kpiTendencia"), elSub=$("kpiTendenciaSub");
+  if(!tend){
+    elVal.textContent="—"; elVal.style.color="";
+    elSub.textContent="Sin datos del mes anterior";
+  } else {
+    const signo = tend.delta>0?"▲":(tend.delta<0?"▼":"▬");
+    const color = tend.delta>0?"#059669":(tend.delta<0?"#dc2626":"#94a3b8");
+    elVal.textContent = `${signo} ${Math.abs(tend.pct)}%`;
+    elVal.style.color = color;
+    elSub.textContent = `${dFiltrado.length.toLocaleString()} vs ${tend.prevTotal.toLocaleString()} (mes anterior)`;
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -872,29 +1024,80 @@ function renderMatrizPersonal(d, nDias){
     return "c-low";
   }
 
-  let html=`<tr>
+  /* Totales del mes anterior por profesional (mismos filtros de EESS/tipo/prestación) */
+  const prevPorProf=new Map();
+  if(PREV_BASE.length){
+    for(const x of aplicarFiltrosA(PREV_BASE)){
+      const p=x.profesional||"SIN PROFESIONAL";
+      prevPorProf.set(p,(prevPorProf.get(p)||0)+1);
+    }
+  }
+
+  let totalAlertas=0, sumCumpl=0, nCumpl=0;
+
+  let html=`<thead><tr>
     <th class="left">ESTABLECIMIENTO</th>
     <th class="left">PERSONAL (CONFIDENCIAL)</th>
     <th class="left">PROFESIÓN</th>
     ${days.map(x=>`<th>${x}</th>`).join("")}
     <th class="th-total">TOTAL</th>
-  </tr>`;
+    <th class="th-total" title="Promedio calculado solo sobre días con al menos 1 registro">PROM/DÍA</th>
+    <th class="th-total">ESTÁNDAR</th>
+    <th class="th-total">% CUMPL.</th>
+    <th class="th-total">TENDENCIA</th>
+  </tr></thead><tbody>`;
 
   for(const r of rows){
+    const estandar=getEstandar(r.profesion);
+    const diasConReg=days.filter(dy=>(r.dd[dy]||0)>0).length;
+    const promDia=diasConReg>0 ? r.total/diasConReg : 0;
+
+    let badgeClass="badge-neutral", badgeTxt="Sin estándar";
+    if(estandar){
+      const cumplPct=Math.round((promDia/estandar)*100);
+      sumCumpl+=cumplPct; nCumpl++;
+      if(cumplPct>UMBRAL_ALTO){ badgeClass="badge-bad"; badgeTxt=`${cumplPct}% ⚠`; }
+      else if(cumplPct>=UMBRAL_BAJO){ badgeClass="badge-ok"; badgeTxt=`${cumplPct}%`; }
+      else{ badgeClass="badge-warn"; badgeTxt=`${cumplPct}%`; }
+    }
+
+    const celdas=days.map(dy=>{
+      const v=r.dd[dy]||0;
+      let cls=cellClass(v);
+      if(estandar && v>estandar){ cls="c-alert"; totalAlertas++; }
+      return `<td${cls?` class="${cls}"`:""}>${v||""}</td>`;
+    }).join("");
+
+    const prevTotal=prevPorProf.get(r.profesional);
+    let tendHtml=`<span class="tendencia-flat">—</span>`;
+    if(prevTotal!==undefined && prevTotal>0){
+      const delta=r.total-prevTotal;
+      const pct=Math.round((delta/prevTotal)*100);
+      if(delta>0) tendHtml=`<span class="tendencia-up">▲ ${pct}%</span>`;
+      else if(delta<0) tendHtml=`<span class="tendencia-down">▼ ${Math.abs(pct)}%</span>`;
+      else tendHtml=`<span class="tendencia-flat">▬ 0%</span>`;
+    }
+
     html+=`<tr>
       <td class="td-eess">${esc(r.establecimiento)}</td>
       <td class="td-prof">${esc(labelConfidencial(r.profesional))}</td>
       <td class="td-prof-tipo">${esc(r.profesion)}</td>
-      ${days.map(dy=>{
-        const v=r.dd[dy]||0;
-        const cls=cellClass(v);
-        return `<td${cls?` class="${cls}"`:""}>${v||""}</td>`;
-      }).join("")}
+      ${celdas}
       <td class="td-total">${r.total}</td>
+      <td>${promDia.toFixed(1)}</td>
+      <td>${estandar??"—"}</td>
+      <td><span class="badge-cumpl ${badgeClass}">${badgeTxt}</span></td>
+      <td>${tendHtml}</td>
     </tr>`;
   }
+  html+="</tbody>";
 
   $("matrizPersonal").innerHTML=html;
+
+  return{
+    alertas: totalAlertas,
+    cumplPromedio: nCumpl ? Math.round(sumCumpl/nCumpl) : null
+  };
 }
 
 /* ══════════════════════════════════════════
@@ -911,7 +1114,7 @@ function renderMatrizEESS(d,nDias){
     if(dia>=1&&dia<=nDias){ obj.dd[dia]+=1; obj.total+=1; }
   }
   const rows=[...map.entries()].map(([k,v])=>({k,...v})).sort((a,b)=>b.total-a.total);
-  let html=`<tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr>`;
+  let html=`<thead><tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
   for(const r of rows){
     html+=`<tr>
       <td class="td-eess">${esc(r.k)}</td>
@@ -919,6 +1122,7 @@ function renderMatrizEESS(d,nDias){
       <td class="td-total">${r.total}</td>
     </tr>`;
   }
+  html+="</tbody>";
   $("matrizEESS").innerHTML=html;
 }
 
@@ -982,9 +1186,21 @@ function snapChartToImg(cId,iId){
   if(!c||!img) return;
   try{ img.src=c.toDataURL("image/png",1.0); }catch(e){}
 }
+function chipHTML(label,val,color){
+  return `<span style="display:inline-flex;gap:5px;align-items:center;padding:3px 10px;
+    border-radius:999px;background:${color}1a;color:${color};border:1px solid ${color}55;
+    font-size:10px;font-weight:700">${label}: ${val}</span>`;
+}
 window.addEventListener("beforeprint",()=>{
   snapChartToImg("c_anio_mes","img_c_anio_mes");
   snapChartToImg("c_years_total","img_c_years_total");
+  $("printKPIs").innerHTML = [
+    chipHTML("Total registros", $("kpiTotal").textContent, "#1e40af"),
+    chipHTML("Profesionales", $("kpiProfs").textContent, "#0891b2"),
+    chipHTML("Establecimientos", $("kpiEESS").textContent, "#7c3aed"),
+    chipHTML("Cumplimiento promedio", $("kpiCumplimiento").textContent, "#059669"),
+    chipHTML("Alertas", $("kpiAlertas").textContent, "#dc2626")
+  ].join("");
 });
 
 /* ══════════════════════════════════════════
@@ -992,8 +1208,6 @@ window.addEventListener("beforeprint",()=>{
 ══════════════════════════════════════════ */
 cargarManifestYAuto();
 </script>
-</body>
-</html>
 </body>
 </html>
 
