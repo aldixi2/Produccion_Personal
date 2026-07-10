@@ -361,6 +361,8 @@
   button:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible{
     outline:2px solid var(--teal);outline-offset:2px;
   }
+  @keyframes fadeInUp{ from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .anim-fadein{ animation:fadeInUp .22s ease }
 
   /* ══════════════════════════════
      IMPRESIÓN
@@ -375,6 +377,11 @@
     .card{margin:0 0 8px 0;box-shadow:none;background:#fff;border:1px solid #e5e7eb;border-radius:6px}
     .scroll{max-height:none;overflow:visible;border:0}
     .kpis{grid-template-columns:repeat(4,1fr)}
+
+    /* Reporte individual de un profesional: es su comprobante mensual de FUAS,
+       no un informe gerencial anual → se oculta el bloque de histórico por año. */
+    body.print-personal #cardReporteAnual{display:none !important}
+    body.print-personal .card{margin:0 0 6px 0}
 
     #printHeader{
       display:flex !important;gap:12px;align-items:center;
@@ -400,6 +407,10 @@
     .pf-item .pf-label{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:#3B5A8A;font-weight:700}
     .pf-item .pf-value{font-size:14.5px;font-weight:700;color:#0F2A5C;font-family:'Space Grotesk','Segoe UI',sans-serif;line-height:1.25}
     .pf-item .pf-value.pf-todos{color:#5B6472;font-weight:600;font-size:12.5px;font-family:'IBM Plex Sans',sans-serif}
+    .pf-desglose{
+      flex-basis:100%;font-size:9.5px;color:#1e3a5f;line-height:1.5;
+      margin-top:2px;padding-top:6px;border-top:1px dashed #C9DCF5;
+    }
 
     #printFooter{
       display:block !important;
@@ -559,7 +570,13 @@
       </div>
       <div class="fg" style="min-width:300px;flex:2">
         <label>Profesional (buscar por apellido o nombre)</label>
-        <input id="profSearch" placeholder="Escribe: illesca, carrillo, ana..." style="width:100%">
+        <div style="position:relative">
+          <input id="profSearch" placeholder="Escribe: illesca, carrillo, ana..." style="width:100%;padding-right:28px">
+          <button id="profSearchClear" type="button" title="Limpiar búsqueda"
+            style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);width:18px;height:18px;border:none;background:none;cursor:pointer;color:var(--muted);padding:0">
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4.5" y1="4.5" x2="13.5" y2="13.5"/><line x1="13.5" y1="4.5" x2="4.5" y2="13.5"/></svg>
+          </button>
+        </div>
         <div class="muted" style="margin-top:3px">Ej: Junior Aldair Illesca Medina → <b>J. A. Illesca Medina</b></div>
         <div id="profHits" class="muted" style="margin-top:4px"></div>
       </div>
@@ -568,7 +585,7 @@
         <input id="prest" placeholder="Buscar servicio o ID (ej: 56 o obstetricia)" style="width:100%">
       </div>
       <div class="fg">
-        <label>Modo matriz personal</label>
+        <label title="Un mismo profesional puede tener producción en más de un establecimiento en el mes">Modo matriz personal ⓘ</label>
         <select id="modo" style="width:190px">
           <option value="auto" selected>Auto (recomendado)</option>
           <option value="por_dni">Por profesional (detalle)</option>
@@ -598,7 +615,7 @@
   </div>
 
   <!-- REPORTE ANUAL -->
-  <div class="card">
+  <div class="card" id="cardReporteAnual">
     <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="13" height="11.5" rx="1.5"/><line x1="2.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="6" y1="2" x2="6" y2="5"/><line x1="12" y1="2" x2="12" y2="5"/></svg></div> Reporte anual (imprimible)</div>
     <div class="muted" style="margin-bottom:10px">
       Total anual y producción por mes del año seleccionado + comparativo total por año.
@@ -645,10 +662,12 @@
       <span><span class="leyenda-dot" style="background:#d97706"></span> Cumplimiento &lt;70%</span>
     </div>
     <div class="muted" style="margin-top:6px">
-      Estándar de referencia (FUAS máx./día por profesión): Médico 60 · Odontólogo 50 · Enfermera 50 · Obstetra 50 ·
+      Estándar de referencia (FUAS máx./día por profesión): Médico 60 · Odontólogo 50 · Enfermera 50 · Obstetra/Obstetriz 50 ·
       Técnico de Enfermería 50 · Nutricionista 40 · Psicólogo 24 · Trabajadora Social 40.
-      <b>Nota:</b> Enfermera y Obstetra tenían dos valores (50 y 40) en la tabla original; se unificaron en <b>50</b>.
+      <b>Nota:</b> Enfermera y Obstetra/Obstetriz tenían dos valores (50 y 40) en la tabla original; se unificaron en <b>50</b>.
       Si corresponde el valor de 40, cámbialo en <code>ESTANDARES_FUA</code> dentro del código (una sola línea por profesión).
+      La comparación reconoce variantes de redacción (Obstetriz, Enfermera(a), Técnico en Enfermería, Cirujano Dentista, etc.)
+      buscando palabra clave, no el texto exacto — si alguna profesión sigue mostrando "Sin estándar", revisa <code>REGLAS_TIPO</code>.
     </div>
   </div>
 
@@ -704,7 +723,7 @@ const ESTANDARES_FUA = {
   "MEDICO":                 60,
   "ODONTOLOGO":             50,
   "ENFERMERA":              50,
-  "OBSTETRA":               50,
+  "OBSTETRA":               50,   // incluye "Obstetriz" (mismo estándar, ver REGLAS_TIPO)
   "TECNICO DE ENFERMERIA":  50,
   "NUTRICIONISTA":          40,
   "PSICOLOGO":              24,
@@ -724,9 +743,31 @@ function normTipo(t){
 const ESTANDARES_NORM = new Map(
   Object.entries(ESTANDARES_FUA).map(([k,v])=>[normTipo(k),v])
 );
+
+/* Los sistemas de salud no siempre escriben la profesión igual
+   ("Obstetriz" en vez de "Obstetra", "Enfermera(a)", "Técnico en
+   Enfermería", "Cirujano Dentista", etc.). Para no depender de la
+   redacción exacta, si no hay coincidencia literal se busca por
+   palabra clave. El orden importa: lo más específico va primero
+   (p.ej. "técnico en enfermería" antes que "enfermería" a secas). */
+const REGLAS_TIPO = [
+  { estandar:"TECNICO DE ENFERMERIA", test:t=>/TECNIC/.test(t) && /ENFERMER/.test(t) },
+  { estandar:"OBSTETRA",              test:t=>/OBSTETR/.test(t) },              // Obstetra / Obstetriz
+  { estandar:"ENFERMERA",             test:t=>/ENFERMER/.test(t) },
+  { estandar:"MEDICO",                test:t=>/MEDIC/.test(t) },
+  { estandar:"ODONTOLOGO",            test:t=>/ODONTOLOG|DENTISTA/.test(t) },
+  { estandar:"NUTRICIONISTA",         test:t=>/NUTRICION/.test(t) },
+  { estandar:"PSICOLOGO",             test:t=>/PSICOLOG/.test(t) },
+  { estandar:"TRABAJADORA SOCIAL",    test:t=>/TRABAJO SOCIAL|TRABAJADOR/.test(t) }
+];
+
 function getEstandar(tipoProfesional){
   const k = normTipo(tipoProfesional);
-  return ESTANDARES_NORM.has(k) ? ESTANDARES_NORM.get(k) : null;
+  if(ESTANDARES_NORM.has(k)) return ESTANDARES_NORM.get(k);
+  for(const regla of REGLAS_TIPO){
+    if(regla.test(k)) return ESTANDARES_FUA[regla.estandar];
+  }
+  return null;
 }
 
 /* ══════════════════════════════════════════
@@ -777,6 +818,7 @@ window.selectProf = (full)=>{
   PROF_SELECTED_FULL = unesc(full);
   $("profSearch").value = PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL)||PROF_SELECTED_FULL;
   $("profHits").textContent = "";
+  actualizarBotonLimpiarBusqueda();
   refreshCascada();
   render();
 };
@@ -790,6 +832,7 @@ $("btnReset").onclick = ()=>{
   $("prest").value=""; $("modo").value="auto";
   $("profSearch").value=""; $("profHits").textContent="";
   PROF_SELECTED_FULL="";
+  actualizarBotonLimpiarBusqueda();
   refreshCascada(); render();
 };
 $("tabPersonal").onclick = ()=>{
@@ -797,19 +840,31 @@ $("tabPersonal").onclick = ()=>{
   $("tabEESS").classList.remove("active");
   $("cardPersonal").style.display="";
   $("cardEESS").style.display="none";
+  $("cardPersonal").classList.remove("anim-fadein"); void $("cardPersonal").offsetWidth; $("cardPersonal").classList.add("anim-fadein");
 };
 $("tabEESS").onclick = ()=>{
   $("tabEESS").classList.add("active");
   $("tabPersonal").classList.remove("active");
   $("cardEESS").style.display="";
   $("cardPersonal").style.display="none";
+  $("cardEESS").classList.remove("anim-fadein"); void $("cardEESS").offsetWidth; $("cardEESS").classList.add("anim-fadein");
 };
 ["estab","tipo","modo"].forEach(id=>{
   $(id).addEventListener("change",()=>{ refreshCascada(); render(); });
 });
 $("prest").addEventListener("input",()=>render());
 
+function actualizarBotonLimpiarBusqueda(){
+  $("profSearchClear").style.display = $("profSearch").value.trim() ? "block" : "none";
+}
+$("profSearchClear").onclick = ()=>{
+  $("profSearch").value="";
+  $("profSearch").dispatchEvent(new Event("input"));
+  $("profSearch").focus();
+};
+
 $("profSearch").addEventListener("input",()=>{
+  actualizarBotonLimpiarBusqueda();
   const q=$("profSearch").value.trim().toLowerCase();
   if(!q){
     PROF_SELECTED_FULL="";
@@ -1079,6 +1134,21 @@ function render(){
 /* Banner destacado de impresión: qué EESS y qué profesional se está viendo */
 const ICON_BUILDING = `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg>`;
 const ICON_USER = `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg>`;
+
+/* Un profesional puede tener producción en más de un EESS en el mismo mes.
+   Se calcula sobre TODA su producción (sin aplicar el filtro de EESS),
+   para que el reporte impreso de esa persona nunca oculte una sede. */
+function desgloseEstablecimientosPersonal(){
+  if(!PROF_SELECTED_FULL) return [];
+  const map=new Map();
+  for(const r of BASE){
+    if(r.profesional!==PROF_SELECTED_FULL) continue;
+    const k=r.establecimiento||"SIN EESS";
+    map.set(k,(map.get(k)||0)+1);
+  }
+  return [...map.entries()].sort((a,b)=>b[1]-a[1]);
+}
+
 function actualizarBannerFiltro(){
   const estab = $("estab").value ? unesc($("estab").value) : "";
   const profLabel = PROF_SELECTED_FULL
@@ -1092,9 +1162,17 @@ function actualizarBannerFiltro(){
     ? `<span class="pf-value">${esc(profLabel)}</span>`
     : `<span class="pf-value pf-todos">Todos los profesionales</span>`;
 
+  let desgloseHtml="";
+  const desglose=desgloseEstablecimientosPersonal();
+  if(desglose.length>1){
+    desgloseHtml=`<div class="pf-desglose"><b>Produjo en ${desglose.length} establecimientos este mes:</b> `
+      + desglose.map(([e,c])=>`${esc(e)} (${c})`).join(" · ") + `</div>`;
+  }
+
   $("printFiltroBanner").innerHTML = `
     <div class="pf-item">${ICON_BUILDING}<div class="pf-tx"><span class="pf-label">Establecimiento</span>${estabHtml}</div></div>
     <div class="pf-item">${ICON_USER}<div class="pf-tx"><span class="pf-label">Personal</span>${profHtml}</div></div>
+    ${desgloseHtml}
   `;
 }
 
@@ -1194,6 +1272,16 @@ function renderMatrizPersonal(d, nDias){
     <th class="th-total">TENDENCIA</th>
   </tr></thead><tbody>`;
 
+  if(rows.length===0){
+    const colspan = 8 + days.length;
+    html += `<tr><td colspan="${colspan}" style="padding:26px 10px;text-align:center">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted)">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+        <div style="font-family:var(--f-cuerpo);font-size:12px">No hay registros para estos filtros. Prueba quitando alguno (EESS, tipo, profesional o prestación).</div>
+      </div>
+    </td></tr>`;
+  }
+
   for(const r of rows){
     const estandar=getEstandar(r.profesion);
     const diasConReg=days.filter(dy=>(r.dd[dy]||0)>0).length;
@@ -1263,6 +1351,14 @@ function renderMatrizEESS(d,nDias){
   }
   const rows=[...map.entries()].map(([k,v])=>({k,...v})).sort((a,b)=>b.total-a.total);
   let html=`<thead><tr><th class="left">EESS</th>${days.map(x=>`<th class="th-day">${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
+  if(rows.length===0){
+    html += `<tr><td colspan="${2+days.length}" style="padding:26px 10px;text-align:center">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted)">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+        <div style="font-family:var(--f-cuerpo);font-size:12px">No hay registros para estos filtros.</div>
+      </div>
+    </td></tr>`;
+  }
   for(const r of rows){
     html+=`<tr>
       <td class="td-eess">${esc(r.k)}</td>
@@ -1339,6 +1435,7 @@ function chipHTML(label,val,color){
     border-radius:999px;background:${color}1a;color:${color};border:1px solid ${color}55;
     font-size:10px;font-weight:700">${label}: ${val}</span>`;
 }
+let __modoAntesDeImprimir = null;
 window.addEventListener("beforeprint",()=>{
   snapChartToImg("c_anio_mes","img_c_anio_mes");
   snapChartToImg("c_years_total","img_c_years_total");
@@ -1349,6 +1446,26 @@ window.addEventListener("beforeprint",()=>{
     chipHTML("Cumplimiento promedio", $("kpiCumplimiento").textContent, "#0E9F6E"),
     chipHTML("Alertas", $("kpiAlertas").textContent, "#DC2626")
   ].join("");
+
+  /* Reporte de UN profesional específico = su comprobante mensual de FUAS.
+     Se oculta el histórico anual (irrelevante para ese informe) y se
+     obliga a mostrar el detalle por establecimiento, aunque el modo
+     en pantalla estuviera en "Resumen (1 fila)". */
+  const esReportePersonal = !!PROF_SELECTED_FULL;
+  document.body.classList.toggle("print-personal", esReportePersonal);
+  if(esReportePersonal && $("modo").value==="resumen"){
+    __modoAntesDeImprimir = $("modo").value;
+    $("modo").value = "auto";
+    render();
+  }
+});
+window.addEventListener("afterprint",()=>{
+  document.body.classList.remove("print-personal");
+  if(__modoAntesDeImprimir){
+    $("modo").value = __modoAntesDeImprimir;
+    __modoAntesDeImprimir = null;
+    render();
+  }
 });
 
 /* ══════════════════════════════════════════
