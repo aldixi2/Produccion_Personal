@@ -4,87 +4,127 @@
 <meta charset="utf-8">
 <title>USPP Chupaca | Producción</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
   :root{
-    --azul:      #1e40af;
-    --azul2:     #1d4ed8;
-    --azul3:     #3b82f6;
-    --azulclaro: #eff6ff;
-    --cian:      #0891b2;
-    --verde:     #059669;
-    --morado:    #7c3aed;
-    --texto:     #0f172a;
-    --muted:     #64748b;
-    --borde:     #e2e8f0;
-    --fondo:     #f1f5f9;
-    --blanco:    #ffffff;
-    --radio:     12px;
+    /* — Marca / cromática institucional — */
+    --navy:       #0F2A5C;   /* azul institucional profundo — cabecera, primario */
+    --navy-2:     #163C7A;   /* hover del primario */
+    --blue:       #2454D9;   /* acciones / enlaces */
+    --teal:       #0891A8;   /* acento de datos — series secundarias, focos */
+    --azulclaro:  #EAF1FC;   /* fondo suave sobre superficies blancas */
+
+    /* — Semántica (cumplimiento / alertas) — nunca decorativa, siempre funcional — */
+    --verde:      #0E9F6E;
+    --ambar:      #D97706;
+    --rojo:       #DC2626;
+    --morado:     #6D4FC2;
+
+    /* — Neutros — */
+    --texto:      #101826;
+    --muted:      #5B6472;
+    --borde:      #E4E1D6;
+    --borde-dato: #E2E6EC;
+    --papel:      #F5F3EC;   /* fondo de página — cálido, evoca formato/ficha */
+    --blanco:     #FFFFFF;
+    --radio:      12px;
+
+    /* — Tipografía — */
+    --f-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --f-cuerpo:  'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+    --f-dato:    'IBM Plex Mono', 'Consolas', monospace;
+
+    /* alias retro-compatibles usados en reglas más abajo */
+    --azul:  var(--navy);
+    --azul2: var(--navy-2);
+    --azul3: var(--blue);
+    --cian:  var(--teal);
+    --fondo: var(--papel);
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;transition-duration:0.001ms !important}
+  }
 
   body{
-    font-family:'Segoe UI',Arial,sans-serif;
-    background:var(--fondo);
+    font-family:var(--f-cuerpo);
+    background:var(--papel);
     color:var(--texto);
     overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
   }
+  h1,h2,h3,.card-titulo,.brand-texto h1,#printTitle{ font-family:var(--f-display); letter-spacing:.1px }
+  .kval,.td-total,.td-num,.th-day,.badge-cumpl,.kpi-anual-badge{ font-family:var(--f-dato); font-variant-numeric:tabular-nums }
 
   /* ══════════════════════════════
      HEADER
   ══════════════════════════════ */
   header{
     position:sticky;top:0;z-index:10;
-    background:var(--blanco);
-    border-bottom:2px solid var(--borde);
-    padding:12px 20px;
+    background:linear-gradient(180deg,var(--navy) 0%,#0C2450 100%);
+    padding:13px 22px 15px;
     display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 6px 16px -8px rgba(15,42,92,.5);
   }
-  .brand{display:flex;gap:12px;align-items:center}
-  .brand img{height:48px;object-fit:contain}
+  header::after{
+    content:'';position:absolute;left:0;right:0;bottom:-6px;height:6px;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='12' viewBox='0 0 140 12'%3E%3Cpath d='M0 6 L46 6 L52 1 L58 11 L64 6 L140 6' fill='none' stroke='%230891A8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:repeat-x;background-size:140px 12px;opacity:.55;
+  }
+  .brand{display:flex;gap:12px;align-items:center;position:relative}
+  .brand img{height:42px;object-fit:contain}
   .brand-logo-fallback{
-    width:48px;height:48px;border-radius:10px;
-    background:var(--azul);
+    width:42px;height:42px;border-radius:11px;flex-shrink:0;
+    background:linear-gradient(145deg,var(--teal),var(--navy) 78%);
     display:flex;align-items:center;justify-content:center;
-    font-weight:800;font-size:11px;color:#fff;text-align:center;line-height:1.3;
-    flex-shrink:0;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
   }
-  .brand-texto h1{font-size:16px;font-weight:700;color:var(--texto);margin:0}
-  .brand-texto .sub{font-size:11px;color:var(--muted);margin-top:1px}
+  .brand-logo-fallback svg{width:24px;height:24px;stroke:#fff}
+  .brand-texto h1{font-size:16px;font-weight:700;color:#fff;margin:0;letter-spacing:.1px}
+  .brand-texto .sub{font-size:11px;color:#B9C7E6;margin-top:2px}
 
   .header-derecha{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
   .bloque-fechas{
-    background:var(--azulclaro);
-    border:1px solid #bfdbfe;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);
     border-radius:10px;
     padding:7px 14px;
     font-size:11px;
     line-height:1.6;
+    display:flex;align-items:center;gap:8px;
+    backdrop-filter:blur(2px);
   }
-  .bloque-fechas .f1{color:var(--azul);font-weight:700;font-size:12px}
-  .bloque-fechas .f2{color:var(--muted)}
+  .bloque-fechas svg{width:14px;height:14px;stroke:#7FD9E8;flex-shrink:0}
+  .bloque-fechas .f1{color:#fff;font-weight:700;font-size:12px;font-family:var(--f-dato)}
+  .bloque-fechas .f2{color:#AEBBDA}
 
   .badge-estado{
-    display:inline-flex;align-items:center;gap:5px;
+    display:inline-flex;align-items:center;gap:6px;
     padding:5px 12px;
-    border:1px solid #bbf7d0;
+    border:1px solid rgba(16,185,129,.4);
     border-radius:999px;
-    background:#f0fdf4;
+    background:rgba(16,185,129,.14);
     font-size:11px;
-    color:#166534;
+    color:#6EE7B7;
     font-weight:600;
   }
-  .badge-estado::before{content:'';width:7px;height:7px;border-radius:50%;background:#16a34a;flex-shrink:0}
+  .badge-estado::before{content:'';width:7px;height:7px;border-radius:50%;background:#34D399;flex-shrink:0;box-shadow:0 0 0 3px rgba(52,211,153,.25)}
 
   .btn-print{
-    background:var(--azul);color:#fff;border:none;
-    padding:9px 18px;border-radius:10px;
+    background:var(--teal);color:#fff;border:none;
+    padding:9px 16px;border-radius:10px;
     font-size:12px;font-weight:700;cursor:pointer;
-    transition:background .15s;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:background .15s, transform .1s;
   }
-  .btn-print:hover{background:var(--azul2)}
+  .btn-print svg{width:15px;height:15px;stroke:#fff}
+  .btn-print:hover{background:#0AA6BE}
+  .btn-print:active{transform:scale(.97)}
 
   /* ══════════════════════════════
      LAYOUT
@@ -93,25 +133,28 @@
 
   .card{
     background:var(--blanco);
-    border:1px solid var(--borde);
+    border:1px solid var(--borde-dato);
     border-radius:var(--radio);
     padding:14px 16px;
     margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(16,24,38,.03);
   }
   .card-titulo{
-    font-size:13px;font-weight:700;color:var(--texto);
+    font-size:13.5px;font-weight:600;color:var(--texto);
     margin-bottom:12px;
-    display:flex;align-items:center;gap:8px;
+    display:flex;align-items:center;gap:9px;
     padding-bottom:8px;
-    border-bottom:1px solid var(--borde);
+    border-bottom:1px solid var(--borde-dato);
   }
   .card-titulo .icono{
-    width:26px;height:26px;border-radius:7px;
-    background:var(--azulclaro);
+    width:27px;height:27px;border-radius:8px;
+    background:linear-gradient(145deg,var(--azulclaro),#DCEBFA);
+    color:var(--navy);
     display:flex;align-items:center;justify-content:center;
-    font-size:14px;flex-shrink:0;
+    flex-shrink:0;
   }
-  .card.soft{background:#f8fafc}
+  .card-titulo .icono svg{width:15px;height:15px;stroke:currentColor}
+  .card.soft{background:#FAF9F4}
 
   /* ══════════════════════════════
      KPI CARDS
@@ -125,21 +168,36 @@
   #kpiCards2{grid-template-columns:repeat(3,1fr)}
   @media(max-width:900px){ .kpis{grid-template-columns:repeat(2,1fr)} }
   .kpi{
+    position:relative;
     background:var(--blanco);
-    border:1px solid var(--borde);
+    border:1px solid var(--borde-dato);
     border-radius:var(--radio);
-    padding:14px 16px;
-    border-top:3px solid var(--azul);
+    padding:14px 44px 14px 16px;
+    border-top:3px solid var(--navy);
+    box-shadow:0 1px 2px rgba(16,24,38,.04);
+    transition:transform .15s, box-shadow .15s;
   }
-  .kpi.k2{border-top-color:var(--cian)}
+  .kpi:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(16,24,38,.18)}
+  .kpi.k2{border-top-color:var(--teal)}
   .kpi.k3{border-top-color:var(--verde)}
   .kpi.k4{border-top-color:var(--morado)}
   .kpi.k5{border-top-color:var(--verde)}
-  .kpi.k6{border-top-color:#dc2626}
-  .kpi.k7{border-top-color:var(--azul3)}
+  .kpi.k6{border-top-color:var(--rojo)}
+  .kpi.k7{border-top-color:var(--blue)}
   .kpi .klabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
-  .kpi .kval{font-size:28px;font-weight:800;color:var(--texto);line-height:1}
-  .kpi .ksub{font-size:11px;color:var(--muted);margin-top:5px}
+  .kpi .kval{font-size:26px;font-weight:700;color:var(--texto);line-height:1}
+  .kpi .ksub{font-size:11px;color:var(--muted);margin-top:5px;font-family:var(--f-cuerpo)}
+  .kpi .kicon{
+    position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;background:var(--navy);color:#fff;
+  }
+  .kpi .kicon svg{width:14px;height:14px;stroke:currentColor}
+  .kpi.k2 .kicon{background:var(--teal)}
+  .kpi.k3 .kicon{background:var(--verde)}
+  .kpi.k4 .kicon{background:var(--morado)}
+  .kpi.k5 .kicon{background:var(--verde)}
+  .kpi.k6 .kicon{background:var(--rojo)}
+  .kpi.k7 .kicon{background:var(--blue)}
 
   /* ══════════════════════════════
      CUMPLIMIENTO / ALERTAS / TENDENCIA
@@ -166,31 +224,40 @@
   .fg label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
   select,input{
     padding:8px 10px;
-    border:1px solid #cbd5e1;
+    border:1px solid #D9D5C8;
     border-radius:9px;
-    background:#f8fafc;
+    background:#FBFAF6;
     color:var(--texto);
     font-size:12px;
+    font-family:var(--f-cuerpo);
     outline:none;
-    transition:border-color .15s;
+    transition:border-color .15s, box-shadow .15s;
   }
-  select:focus,input:focus{border-color:var(--azul);background:#fff}
+  select:focus,input:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(8,145,168,.14)}
+  .btn-ap,.btn-cl,.btn-cargar{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--f-cuerpo);
+  }
+  .btn-ap svg,.btn-cl svg,.btn-cargar svg{width:13px;height:13px;stroke:currentColor;flex-shrink:0}
   .btn-ap{
-    background:var(--azul);color:#fff;border:none;
+    background:var(--navy);color:#fff;border:none;
     padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;
+    transition:background .15s, transform .1s;
   }
-  .btn-ap:hover{background:var(--azul2)}
+  .btn-ap:hover{background:var(--navy-2)}
+  .btn-ap:active{transform:scale(.97)}
   .btn-cl{
-    background:#f1f5f9;border:1px solid #cbd5e1;color:#475569;
+    background:#fff;border:1px solid #D9D5C8;color:#5B6472;
     padding:8px 14px;border-radius:9px;font-size:12px;cursor:pointer;
+    transition:background .15s;
   }
-  .btn-cl:hover{background:#e2e8f0}
+  .btn-cl:hover{background:#F1EFE7}
   .muted{color:var(--muted);font-size:11px;line-height:1.4}
 
   .badge{
     display:inline-block;padding:3px 10px;
-    border:1px solid var(--borde);
-    border-radius:999px;background:#f8fafc;font-size:12px;color:var(--texto);
+    border:1px solid var(--borde-dato);
+    border-radius:999px;background:#F6F5F0;font-size:12px;color:var(--texto);
   }
 
   /* ══════════════════════════════
@@ -198,8 +265,8 @@
   ══════════════════════════════ */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
   .chartbox{
-    border:1px solid var(--borde);border-radius:10px;
-    padding:12px;background:#f8fafc;
+    border:1px solid var(--borde-dato);border-radius:10px;
+    padding:12px;background:#FBFAF7;
   }
   .chartbox-titulo{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
   .chartbox canvas{height:220px !important;max-height:220px !important}
@@ -209,78 +276,97 @@
      KPI ANUAL
   ══════════════════════════════ */
   .kpi-anual-badge{
-    display:inline-block;
+    display:inline-flex;align-items:center;gap:7px;
     background:var(--azulclaro);
-    border:1px solid #bfdbfe;
+    border:1px solid #C9DCF5;
     border-radius:10px;
     padding:6px 16px;
-    font-size:13px;font-weight:700;color:var(--azul);
+    font-size:13px;font-weight:700;color:var(--navy);
   }
+  .kpi-anual-badge svg{width:14px;height:14px;stroke:currentColor}
   .btn-cargar{
-    background:#f1f5f9;border:1px solid #cbd5e1;color:#374151;
+    background:#fff;border:1px solid #D9D5C8;color:#374151;
     padding:7px 14px;border-radius:9px;font-size:12px;cursor:pointer;
+    transition:background .15s;
   }
-  .btn-cargar:hover{background:#e2e8f0}
+  .btn-cargar:hover{background:#F1EFE7}
 
   /* ══════════════════════════════
      TABS
   ══════════════════════════════ */
   .tabs{display:flex;gap:8px;flex-wrap:wrap}
   .tab{
-    padding:7px 16px;
-    border:1px solid var(--borde);
+    padding:7px 16px 7px 12px;
+    border:1px solid var(--borde-dato);
     border-radius:999px;
-    background:#f8fafc;
-    cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);
+    background:#fff;
+    cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);
+    display:inline-flex;align-items:center;gap:7px;
     transition:all .15s;
   }
+  .tab svg{width:14px;height:14px;stroke:currentColor}
+  .tab:hover{border-color:var(--teal);color:var(--navy)}
   .tab.active{
-    background:var(--azul);border-color:var(--azul);
+    background:var(--navy);border-color:var(--navy);
     color:#fff;font-weight:700;
   }
 
   /* ══════════════════════════════
      TABLAS
   ══════════════════════════════ */
-  .scroll{overflow:auto;max-height:560px;border-radius:10px;border:1px solid var(--borde)}
+  .scroll{overflow:auto;max-height:560px;border-radius:10px;border:1px solid var(--borde-dato)}
   table{border-collapse:collapse;width:100%;font-size:11px;background:#fff}
   th{
-    background:var(--azul);color:#fff;
-    padding:6px 7px;text-align:center;white-space:nowrap;
-    position:sticky;top:0;z-index:2;font-weight:600;font-size:11px;
+    background:var(--navy);color:#fff;
+    padding:7px 7px;text-align:center;white-space:nowrap;
+    position:sticky;top:0;z-index:2;font-weight:600;font-size:10.5px;
+    letter-spacing:.3px;
   }
-  th.left{text-align:left}
-  th.th-total{background:#1e3a8a}
+  th.left{text-align:left;font-family:var(--f-cuerpo)}
+  th.th-total{background:#0A2247}
+  th.th-day{font-family:var(--f-dato);font-weight:500;color:#BFD3EE}
   td{
-    border-bottom:1px solid #f1f5f9;
+    border-bottom:1px solid #F1EFE7;
     padding:4px 6px;text-align:center;
-    white-space:nowrap;color:#334155;font-size:11px;
+    white-space:nowrap;color:#33404E;font-size:11px;
   }
-  tr:nth-child(even) td{background:#f8fafc}
-  tr:hover td{background:#eff6ff !important}
+  tr:nth-child(even) td{background:#FAF9F5}
+  tr:hover td{background:var(--azulclaro) !important}
   .left{text-align:left}
-  .td-eess{text-align:left !important;font-weight:600;color:var(--texto);max-width:160px;overflow:hidden;text-overflow:ellipsis}
-  .td-prof{text-align:left !important;color:var(--texto);font-weight:500}
-  .td-prof-tipo{text-align:left !important;color:var(--muted)}
-  .td-total{font-weight:800;color:var(--azul);font-size:12px}
+  .td-eess{text-align:left !important;font-weight:600;color:var(--texto);max-width:160px;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-cuerpo)}
+  .td-prof{text-align:left !important;color:var(--texto);font-weight:500;font-family:var(--f-cuerpo)}
+  .td-prof-tipo{text-align:left !important;color:var(--muted);font-family:var(--f-cuerpo)}
+  .td-total{font-weight:700;color:var(--navy);font-size:12px}
+  .td-num{color:#33404E}
 
-  /* Heatmap en celdas */
-  .c-hot{background:#1e40af !important;color:#fff !important;font-weight:700;border-radius:3px}
-  .c-med{background:#bfdbfe !important;color:#1e3a8a !important;font-weight:600;border-radius:3px}
-  .c-low{background:#f0f9ff !important;color:#0369a1 !important}
+  /* Heatmap — escala teal → navy (misma familia del acento de datos) */
+  .c-hot{background:var(--navy) !important;color:#fff !important;font-weight:700;border-radius:4px}
+  .c-med{background:#9FD8E2 !important;color:#0A3F4A !important;font-weight:600;border-radius:4px}
+  .c-low{background:#EAF6F8 !important;color:#0A6E80 !important;border-radius:4px}
   .c-alert{
-    background:#fecaca !important;color:#7f1d1d !important;font-weight:800;
-    border-radius:3px;box-shadow:inset 0 0 0 1.5px #dc2626;
+    position:relative;
+    background:#FCE2E2 !important;color:#7f1d1d !important;font-weight:800;
+    border-radius:4px;box-shadow:inset 0 0 0 1.5px var(--rojo);
+  }
+  .c-alert::before{
+    content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+    width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;
+    border-bottom:4px solid var(--rojo);
   }
 
   .leyenda{display:flex;gap:14px;margin-top:8px;font-size:10px;color:var(--muted);flex-wrap:wrap}
   .leyenda span{display:flex;align-items:center;gap:5px}
-  .leyenda-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .leyenda-dot{width:10px;height:10px;border-radius:2px;display:inline-block;border:1px solid rgba(16,24,38,.12)}
+
+  button:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible{
+    outline:2px solid var(--teal);outline-offset:2px;
+  }
 
   /* ══════════════════════════════
      IMPRESIÓN
   ══════════════════════════════ */
   #printHeader,#printFooter{display:none}
+  #printFiltroBanner{display:none}
 
   @media print{
     @page{ size:A4 landscape; margin:9mm 8mm; }
@@ -293,13 +379,27 @@
     #printHeader{
       display:flex !important;gap:12px;align-items:center;
       margin-bottom:8px;padding-bottom:8px;
-      border-bottom:2px solid #1e40af;
+      border-bottom:2px solid #0F2A5C;
     }
     #printHeader img{height:46px}
-    #printTitle{margin:0;font-size:16px;font-weight:800;color:#1e40af;letter-spacing:.2px}
+    #printTitle{margin:0;font-size:16px;font-weight:700;color:#0F2A5C;letter-spacing:.2px;font-family:'Space Grotesk','Segoe UI',sans-serif}
     #printSub{font-size:10.5px;color:#374151;margin-top:3px;font-weight:600}
     #printFechas{font-size:9.5px;color:#64748b;margin-top:2px}
     #printKPIs span{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+    #printFiltroBanner{
+      display:flex !important;gap:22px;flex-wrap:wrap;align-items:center;
+      margin:0 0 9px 0;padding:8px 14px;
+      background:#EAF1FC;border:1px solid #C9DCF5;border-left:5px solid #0F2A5C;
+      border-radius:7px;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    }
+    .pf-item{display:flex;align-items:center;gap:7px}
+    .pf-item svg{width:15px;height:15px;stroke:#0F2A5C;flex-shrink:0}
+    .pf-item .pf-tx{display:flex;flex-direction:column;gap:0}
+    .pf-item .pf-label{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:#3B5A8A;font-weight:700}
+    .pf-item .pf-value{font-size:14.5px;font-weight:700;color:#0F2A5C;font-family:'Space Grotesk','Segoe UI',sans-serif;line-height:1.25}
+    .pf-item .pf-value.pf-todos{color:#5B6472;font-weight:600;font-size:12.5px;font-family:'IBM Plex Sans',sans-serif}
 
     #printFooter{
       display:block !important;
@@ -317,11 +417,12 @@
     tbody{display:table-row-group}
     tr{page-break-inside:avoid;break-inside:avoid}
 
-    th{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    th.th-total{background:#1e3a8a !important}
-    .c-hot{background:#1e40af !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .c-med{background:#bfdbfe !important;color:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .c-alert{background:#fecaca !important;color:#7f1d1d !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    th{background:#0F2A5C !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    th.th-total{background:#0A2247 !important}
+    th.th-day{color:#BFD3EE !important}
+    .c-hot{background:#0F2A5C !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .c-med{background:#9FD8E2 !important;color:#0A3F4A !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .c-alert{background:#FCE2E2 !important;color:#7f1d1d !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .badge-ok,.badge-warn,.badge-bad,.badge-neutral{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .kpi{border-top-width:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
@@ -337,7 +438,11 @@
   <div class="brand">
     <img src="logo.png" alt="USPP Chupaca" id="logoImg"
          onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
-    <div class="brand-logo-fallback" id="logoFallback" style="display:none">USPP<br>CHU</div>
+    <div class="brand-logo-fallback" id="logoFallback" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 13h4l2 6 4-13 2 7h8"/>
+      </svg>
+    </div>
     <div class="brand-texto">
       <h1>Dashboard de Producción — USPP Chupaca</h1>
       <div class="sub">Sistema de Información del Personal de Salud</div>
@@ -346,11 +451,17 @@
 
   <div class="header-derecha">
     <div class="bloque-fechas">
-      <div class="f1" id="fechaActualizacion">⏱ Actualizado: cargando…</div>
-      <div class="f2" id="fechaDigitacion">Fecha de digitación al: —</div>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6.5"/><path d="M9 5.3V9l2.7 1.3"/></svg>
+      <div>
+        <div class="f1" id="fechaActualizacion">Actualizado: cargando…</div>
+        <div class="f2" id="fechaDigitacion">Fecha de digitación al: —</div>
+      </div>
     </div>
     <div class="badge-estado" id="estado">Cargando…</div>
-    <button class="btn-print" onclick="window.print()">🖨️ Imprimir reporte</button>
+    <button class="btn-print" onclick="window.print()">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="10" height="6" rx="1"/><path d="M5.5 7V3.5h7V7"/><path d="M5.5 13v3h7v-3"/></svg>
+      Imprimir reporte
+    </button>
   </div>
 </header>
 
@@ -370,24 +481,31 @@
     </div>
   </div>
 
+  <!-- Banner destacado: qué EESS / qué personal se está viendo (solo impresión) -->
+  <div id="printFiltroBanner"></div>
+
   <!-- KPIs -->
   <div class="kpis no-print" id="kpiCards">
     <div class="kpi">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="13" height="13" rx="2"/><line x1="2.5" y1="7" x2="15.5" y2="7"/><line x1="6" y1="10.3" x2="9" y2="10.3"/></svg></div>
       <div class="klabel">Total registros</div>
       <div class="kval" id="kpiTotal">—</div>
       <div class="ksub" id="kpiTotalSub">Mes seleccionado</div>
     </div>
     <div class="kpi k2">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg></div>
       <div class="klabel">Profesionales activos</div>
       <div class="kval" id="kpiProfs">—</div>
       <div class="ksub">Con producción</div>
     </div>
     <div class="kpi k3">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg></div>
       <div class="klabel">Establecimientos</div>
       <div class="kval" id="kpiEESS">—</div>
       <div class="ksub">Con producción</div>
     </div>
     <div class="kpi k4">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="15" x2="3" y2="9"/><line x1="9" y1="15" x2="9" y2="5"/><line x1="15" y1="15" x2="15" y2="11"/></svg></div>
       <div class="klabel">Promedio diario</div>
       <div class="kval" id="kpiProm">—</div>
       <div class="ksub">Registros / día</div>
@@ -396,16 +514,19 @@
 
   <div class="kpis no-print" id="kpiCards2">
     <div class="kpi k5">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.3l6 2v4.4c0 4-2.6 6.6-6 7.7-3.4-1.1-6-3.7-6-7.7V4.3l6-2z"/><path d="M6.3 9l1.7 1.7 3.5-3.7"/></svg></div>
       <div class="klabel">Cumplimiento promedio</div>
       <div class="kval" id="kpiCumplimiento">—</div>
       <div class="ksub">Vs. estándar FUAS/día por profesión</div>
     </div>
     <div class="kpi k6">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.8l7.2 12.4H1.8L9 2.8z"/><line x1="9" y1="7.3" x2="9" y2="10.8"/><circle cx="9" cy="12.8" r="0.15" fill="currentColor"/></svg></div>
       <div class="klabel">Alertas de sobreproducción</div>
       <div class="kval" id="kpiAlertas">—</div>
       <div class="ksub">Días con FUAS &gt; estándar</div>
     </div>
     <div class="kpi k7">
+      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,13 7,8 10,11 16,4"/><polyline points="11,4 16,4 16,9"/></svg></div>
       <div class="klabel">Tendencia vs. mes anterior</div>
       <div class="kval" id="kpiTendencia">—</div>
       <div class="ksub" id="kpiTendenciaSub">Total de registros</div>
@@ -414,7 +535,7 @@
 
   <!-- FILTROS -->
   <div class="card no-print">
-    <div class="card-titulo"><div class="icono">🔍</div> Filtros inteligentes (cascada)</div>
+    <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5.3"/><line x1="12.3" y1="12.3" x2="16.5" y2="16.5"/></svg></div> Filtros inteligentes (cascada)</div>
     <div class="filtros-nota">
       DNI usado = <b>DNI Resp. Aten.</b> (profesional). No se cruza con DNI del paciente.
       &nbsp;·&nbsp; <b>Modo confidencial:</b> solo se muestran iniciales + apellidos.
@@ -463,7 +584,7 @@
 
   <!-- GRÁFICOS GENERALES -->
   <div class="card no-print">
-    <div class="card-titulo"><div class="icono">📊</div> Gráficos — vista general</div>
+    <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="15" x2="3" y2="9"/><line x1="9" y1="15" x2="9" y2="4"/><line x1="15" y1="15" x2="15" y2="11"/></svg></div> Gráficos — vista general</div>
     <div class="grid">
       <div class="chartbox">
         <div class="chartbox-titulo">Top 15 establecimientos (por registros)</div>
@@ -478,13 +599,16 @@
 
   <!-- REPORTE ANUAL -->
   <div class="card">
-    <div class="card-titulo"><div class="icono">📅</div> Reporte anual (imprimible)</div>
+    <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="13" height="11.5" rx="1.5"/><line x1="2.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="6" y1="2" x2="6" y2="5"/><line x1="12" y1="2" x2="12" y2="5"/></svg></div> Reporte anual (imprimible)</div>
     <div class="muted" style="margin-bottom:10px">
       Total anual y producción por mes del año seleccionado + comparativo total por año.
     </div>
     <div class="row" style="align-items:center;margin-bottom:10px">
       <div class="kpi-anual-badge" id="kpiAnual">Total anual: —</div>
-      <button class="btn-cargar no-print" id="btnCargarAnio" style="margin-left:auto">📅 Cargar año</button>
+      <button class="btn-cargar no-print" id="btnCargarAnio" style="margin-left:auto">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 9a6.5 6.5 0 1 1-1.9-4.6"/><path d="M15.5 3v3.5H12"/></svg>
+        Cargar año
+      </button>
     </div>
     <div class="grid">
       <div class="chartbox">
@@ -503,32 +627,34 @@
   <!-- TABS -->
   <div class="card soft no-print">
     <div class="tabs">
-      <div class="tab active" id="tabPersonal">👤 Matriz del personal</div>
-      <div class="tab" id="tabEESS">🏥 Matriz por establecimiento</div>
+      <div class="tab active" id="tabPersonal"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg> Matriz del personal</div>
+      <div class="tab" id="tabEESS"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg> Matriz por establecimiento</div>
     </div>
   </div>
 
   <!-- MATRIZ PERSONAL -->
   <div class="card" id="cardPersonal">
-    <div class="card-titulo"><div class="icono">👤</div> Matriz del personal (EESS + Personal + días) — Confidencial</div>
+    <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg></div> Matriz del personal (EESS + Personal + días) — Confidencial</div>
     <div class="scroll" style="margin-top:4px"><table id="matrizPersonal"></table></div>
     <div class="leyenda">
-      <span><span class="leyenda-dot" style="background:#1e40af"></span> Alta producción</span>
-      <span><span class="leyenda-dot" style="background:#bfdbfe"></span> Media producción</span>
-      <span><span class="leyenda-dot" style="background:#f0f9ff"></span> Baja producción</span>
+      <span><span class="leyenda-dot" style="background:#0F2A5C"></span> Alta producción</span>
+      <span><span class="leyenda-dot" style="background:#9FD8E2"></span> Media producción</span>
+      <span><span class="leyenda-dot" style="background:#EAF6F8"></span> Baja producción</span>
       <span><span class="leyenda-dot" style="background:#dc2626"></span> Alerta: día con FUAS &gt; estándar</span>
-      <span><span class="leyenda-dot" style="background:#059669"></span> Cumplimiento ≥70% y ≤110%</span>
+      <span><span class="leyenda-dot" style="background:#0E9F6E"></span> Cumplimiento ≥70% y ≤110%</span>
       <span><span class="leyenda-dot" style="background:#d97706"></span> Cumplimiento &lt;70%</span>
     </div>
     <div class="muted" style="margin-top:6px">
       Estándar de referencia (FUAS máx./día por profesión): Médico 60 · Odontólogo 50 · Enfermera 50 · Obstetra 50 ·
       Técnico de Enfermería 50 · Nutricionista 40 · Psicólogo 24 · Trabajadora Social 40.
-          </div>
+      <b>Nota:</b> Enfermera y Obstetra tenían dos valores (50 y 40) en la tabla original; se unificaron en <b>50</b>.
+      Si corresponde el valor de 40, cámbialo en <code>ESTANDARES_FUA</code> dentro del código (una sola línea por profesión).
+    </div>
   </div>
 
   <!-- MATRIZ EESS -->
   <div class="card" id="cardEESS" style="display:none">
-    <div class="card-titulo"><div class="icono">🏥</div> Matriz por establecimiento (EESS × días)</div>
+    <div class="card-titulo"><div class="icono"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg></div> Matriz por establecimiento (EESS × días)</div>
     <div class="scroll" style="margin-top:4px"><table id="matrizEESS"></table></div>
   </div>
 
@@ -559,10 +685,14 @@ const MONTHS = [
 
 /* Paleta de colores para gráficos */
 const PALETTE = [
-  "#1e40af","#0891b2","#059669","#7c3aed",
-  "#b45309","#be185d","#0e7490","#065f46",
-  "#4338ca","#c2410c","#0369a1","#6d28d9"
+  "#0F2A5C","#0891A8","#0E9F6E","#6D4FC2",
+  "#D97706","#BE185D","#2454D9","#065F46",
+  "#4338CA","#C2410C","#0369A1","#7C3AED"
 ];
+if(window.Chart){
+  Chart.defaults.font.family = "'IBM Plex Sans','Segoe UI',sans-serif";
+  Chart.defaults.color = "#5B6472";
+}
 
 /* ══════════════════════════════════════════
    ESTÁNDARES DE PRODUCCIÓN (FUAS máx./día/persona)
@@ -718,7 +848,7 @@ async function cargarManifestYAuto(){
   const pad = n=>String(n).padStart(2,"0");
   const fechaAhora = `${pad(ahora.getDate())}/${pad(ahora.getMonth()+1)}/${ahora.getFullYear()} `
     + `${ahora.getHours()%12||12}:${pad(ahora.getMinutes())} ${ahora.getHours()>=12?"PM":"AM"}`;
-  $("fechaActualizacion").textContent = `⏱ Actualizado: ${fechaAhora}`;
+  $("fechaActualizacion").textContent = `Actualizado: ${fechaAhora}`;
   $("fechaDigitacion").textContent    = `Fecha de digitación al: ${formatFecha(m.generado||"")}`;
   $("printFechaFooter").textContent   = `Actualizado: ${fechaAhora} | Digitación al: ${formatFecha(m.generado||"")}`;
 
@@ -817,12 +947,12 @@ function renderAnual(){
   chartAnioMes=new Chart($("c_anio_mes"),{
     type:"bar",
     data:{ labels, datasets:[{ label:"Registros", data,
-      backgroundColor: data.map((_,i)=>`rgba(30,64,175,${0.55+0.45*(i/11)})`),
+      backgroundColor: data.map((_,i)=>`rgba(15,42,92,${0.55+0.45*(i/11)})`),
       borderRadius:5, borderSkipped:false
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false} },
-      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#f1f5f9"}} }
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#EDEAE0"}} }
     }
   });
 }
@@ -857,12 +987,12 @@ function renderTotalesPorAnios(){
   chartYearsTotal=new Chart($("c_years_total"),{
     type:"bar",
     data:{ labels, datasets:[{ label:"Total anual", data,
-      backgroundColor:["#0891b2","#1e40af","#7c3aed","#059669"].slice(0,years.length),
+      backgroundColor:["#0891A8","#0F2A5C","#6D4FC2","#0E9F6E"].slice(0,years.length),
       borderRadius:6, borderSkipped:false
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false} },
-      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#f1f5f9"}} }
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:"#EDEAE0"}} }
     }
   });
 }
@@ -898,13 +1028,9 @@ function refreshCascada(){
 function filtrosTexto(){
   const anio=$("anio").value, mes=$("mes").value;
   const mesName=MONTHS.find(x=>String(x.n)===String(mes))?.t||mes;
-  const estab=$("estab").value?`EESS: ${unesc($("estab").value)}`:"EESS: Todos";
   const tipo=$("tipo").value?`Tipo: ${unesc($("tipo").value)}`:"Tipo: Todos";
   const prest=$("prest").value.trim()?`Prestación: ${$("prest").value.trim()}`:"Prestación: —";
-  const profLabel=PROF_SELECTED_FULL
-    ?`Profesional: ${PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL)||labelConfidencial(PROF_SELECTED_FULL)}`
-    :"Profesional: Todos";
-  return `Periodo: ${anio} — ${mesName}  |  ${estab}  |  ${tipo}  |  ${profLabel}  |  ${prest}`;
+  return `Periodo: ${anio} — ${mesName}  |  ${tipo}  |  ${prest}`;
 }
 
 function aplicarFiltrosA(dataset){
@@ -939,6 +1065,7 @@ function render(){
   if(!BASE.length) return;
   $("printSub").textContent=filtrosTexto();
   $("printFechas").textContent=$("fechaActualizacion").textContent+" | "+$("fechaDigitacion").textContent;
+  actualizarBannerFiltro();
   const d=aplicarFiltros();
   const anio=$("anio").value, mes=$("mes").value;
   const nDias=diasEnMes(anio,mes);
@@ -947,6 +1074,28 @@ function render(){
   actualizarKPIsCumplimiento(stats, d);
   renderMatrizEESS(d,nDias);
   renderCharts(d);
+}
+
+/* Banner destacado de impresión: qué EESS y qué profesional se está viendo */
+const ICON_BUILDING = `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg>`;
+const ICON_USER = `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg>`;
+function actualizarBannerFiltro(){
+  const estab = $("estab").value ? unesc($("estab").value) : "";
+  const profLabel = PROF_SELECTED_FULL
+    ? (PROF_FULL_TO_LABEL.get(PROF_SELECTED_FULL) || labelConfidencial(PROF_SELECTED_FULL))
+    : "";
+
+  const estabHtml = estab
+    ? `<span class="pf-value">${esc(estab)}</span>`
+    : `<span class="pf-value pf-todos">Todos los establecimientos</span>`;
+  const profHtml = profLabel
+    ? `<span class="pf-value">${esc(profLabel)}</span>`
+    : `<span class="pf-value pf-todos">Todos los profesionales</span>`;
+
+  $("printFiltroBanner").innerHTML = `
+    <div class="pf-item">${ICON_BUILDING}<div class="pf-tx"><span class="pf-label">Establecimiento</span>${estabHtml}</div></div>
+    <div class="pf-item">${ICON_USER}<div class="pf-tx"><span class="pf-label">Personal</span>${profHtml}</div></div>
+  `;
 }
 
 /* ── KPIs dinámicos ── */
@@ -1037,7 +1186,7 @@ function renderMatrizPersonal(d, nDias){
     <th class="left">ESTABLECIMIENTO</th>
     <th class="left">PERSONAL (CONFIDENCIAL)</th>
     <th class="left">PROFESIÓN</th>
-    ${days.map(x=>`<th>${x}</th>`).join("")}
+    ${days.map(x=>`<th class="th-day">${x}</th>`).join("")}
     <th class="th-total">TOTAL</th>
     <th class="th-total" title="Promedio calculado solo sobre días con al menos 1 registro">PROM/DÍA</th>
     <th class="th-total">ESTÁNDAR</th>
@@ -1063,7 +1212,8 @@ function renderMatrizPersonal(d, nDias){
       const v=r.dd[dy]||0;
       let cls=cellClass(v);
       if(estandar && v>estandar){ cls="c-alert"; totalAlertas++; }
-      return `<td${cls?` class="${cls}"`:""}>${v||""}</td>`;
+      cls = cls ? `td-num ${cls}` : "td-num";
+      return `<td class="${cls}">${v||""}</td>`;
     }).join("");
 
     const prevTotal=prevPorProf.get(r.profesional);
@@ -1082,8 +1232,8 @@ function renderMatrizPersonal(d, nDias){
       <td class="td-prof-tipo">${esc(r.profesion)}</td>
       ${celdas}
       <td class="td-total">${r.total}</td>
-      <td>${promDia.toFixed(1)}</td>
-      <td>${estandar??"—"}</td>
+      <td class="td-num">${promDia.toFixed(1)}</td>
+      <td class="td-num">${estandar??"—"}</td>
       <td><span class="badge-cumpl ${badgeClass}">${badgeTxt}</span></td>
       <td>${tendHtml}</td>
     </tr>`;
@@ -1112,11 +1262,11 @@ function renderMatrizEESS(d,nDias){
     if(dia>=1&&dia<=nDias){ obj.dd[dia]+=1; obj.total+=1; }
   }
   const rows=[...map.entries()].map(([k,v])=>({k,...v})).sort((a,b)=>b.total-a.total);
-  let html=`<thead><tr><th class="left">EESS</th>${days.map(x=>`<th>${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
+  let html=`<thead><tr><th class="left">EESS</th>${days.map(x=>`<th class="th-day">${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
   for(const r of rows){
     html+=`<tr>
       <td class="td-eess">${esc(r.k)}</td>
-      ${days.map(dy=>`<td>${r.dd[dy]||""}</td>`).join("")}
+      ${days.map(dy=>`<td class="td-num">${r.dd[dy]||""}</td>`).join("")}
       <td class="td-total">${r.total}</td>
     </tr>`;
   }
@@ -1153,13 +1303,13 @@ function renderCharts(d){
       label:"Registros", data:topE.map(x=>x[1]),
       backgroundColor: topE.map((_,i)=>{
         const alpha=0.55+0.45*(i===0?1:(1-i/topE.length));
-        return `rgba(30,64,175,${alpha.toFixed(2)})`;
+        return `rgba(15,42,92,${alpha.toFixed(2)})`;
       }),
       borderRadius:5, borderSkipped:false
     }]},
     options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false} },
-      scales:{ x:{grid:{color:"#f1f5f9"}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
+      scales:{ x:{grid:{color:"#EDEAE0"}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
     }
   });
 
@@ -1193,11 +1343,11 @@ window.addEventListener("beforeprint",()=>{
   snapChartToImg("c_anio_mes","img_c_anio_mes");
   snapChartToImg("c_years_total","img_c_years_total");
   $("printKPIs").innerHTML = [
-    chipHTML("Total registros", $("kpiTotal").textContent, "#1e40af"),
-    chipHTML("Profesionales", $("kpiProfs").textContent, "#0891b2"),
-    chipHTML("Establecimientos", $("kpiEESS").textContent, "#7c3aed"),
-    chipHTML("Cumplimiento promedio", $("kpiCumplimiento").textContent, "#059669"),
-    chipHTML("Alertas", $("kpiAlertas").textContent, "#dc2626")
+    chipHTML("Total registros", $("kpiTotal").textContent, "#0F2A5C"),
+    chipHTML("Profesionales", $("kpiProfs").textContent, "#0891A8"),
+    chipHTML("Establecimientos", $("kpiEESS").textContent, "#6D4FC2"),
+    chipHTML("Cumplimiento promedio", $("kpiCumplimiento").textContent, "#0E9F6E"),
+    chipHTML("Alertas", $("kpiAlertas").textContent, "#DC2626")
   ].join("");
 });
 
@@ -1208,4 +1358,3 @@ cargarManifestYAuto();
 </script>
 </body>
 </html>
-
