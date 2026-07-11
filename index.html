@@ -333,11 +333,25 @@
   tr:nth-child(even) td{background:#FAF9F5}
   tr:hover td{background:var(--azulclaro) !important}
   .left{text-align:left}
-  .td-eess{text-align:left !important;font-weight:600;color:var(--texto);max-width:160px;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-cuerpo)}
-  .td-prof{text-align:left !important;color:var(--texto);font-weight:500;font-family:var(--f-cuerpo)}
+  .td-eess{text-align:left !important;font-weight:600;color:var(--texto);max-width:160px;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-cuerpo);background:#fff}
+  .td-prof{text-align:left !important;color:var(--texto);font-weight:500;font-family:var(--f-cuerpo);background:#fff}
   .td-prof-tipo{text-align:left !important;color:var(--muted);font-family:var(--f-cuerpo)}
   .td-total{font-weight:700;color:var(--navy);font-size:12px}
   .td-num{color:#33404E}
+
+  /* ══════════════════════════════
+     COLUMNAS FIJAS (Establecimiento + Personal)
+     No requieren cálculo de ancho: cada .sticky-col fija su propio
+     borde izquierdo relativo a la anterior mediante --sticky-left.
+  ══════════════════════════════ */
+  .sticky-col{position:sticky;z-index:1;left:var(--sticky-left,0)}
+  th.sticky-col{z-index:3}
+  .sticky-col.sticky-last{box-shadow:4px 0 6px -4px rgba(16,24,38,.18)}
+  .th-eess,.td-eess{width:150px;max-width:150px}
+  .th-prof,.td-prof{width:135px;max-width:135px;overflow:hidden;text-overflow:ellipsis}
+  @media print{
+    .sticky-col{position:static !important;box-shadow:none !important}
+  }
 
   /* Heatmap — escala teal → navy (misma familia del acento de datos) */
   .c-hot{background:var(--navy) !important;color:#fff !important;font-weight:700;border-radius:4px}
@@ -363,6 +377,29 @@
   }
   @keyframes fadeInUp{ from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
   .anim-fadein{ animation:fadeInUp .22s ease }
+
+  /* ══════════════════════════════
+     ESQUELETO DE CARGA
+  ══════════════════════════════ */
+  @keyframes skeletonShimmer{ 0%{background-position:-200px 0} 100%{background-position:200px 0} }
+  .kval.skeleton{
+    color:transparent !important;
+    background:linear-gradient(90deg,#E9E7DE 25%,#F5F3EC 37%,#E9E7DE 63%);
+    background-size:400px 100%;
+    animation:skeletonShimmer 1.4s ease infinite;
+    border-radius:6px;
+    display:inline-block;
+    min-width:46px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .kval.skeleton{animation:none;background:#EDEAE0}
+  }
+
+  /* ══════════════════════════════
+     ANILLO DE PROGRESO (KPI cumplimiento)
+  ══════════════════════════════ */
+  .kpi .kpi-ring{position:absolute;top:10px;right:10px;width:34px;height:34px}
+  .kpi .kpi-ring circle{transition:stroke-dashoffset .6s ease, stroke .3s ease}
 
   /* ══════════════════════════════
      IMPRESIÓN
@@ -500,46 +537,50 @@
     <div class="kpi">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="13" height="13" rx="2"/><line x1="2.5" y1="7" x2="15.5" y2="7"/><line x1="6" y1="10.3" x2="9" y2="10.3"/></svg></div>
       <div class="klabel">Total registros</div>
-      <div class="kval" id="kpiTotal">—</div>
+      <div class="kval skeleton" id="kpiTotal" data-raw-val="0">00</div>
       <div class="ksub" id="kpiTotalSub">Mes seleccionado</div>
     </div>
     <div class="kpi k2">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3.5 15.5c0-3.3 2.5-5.3 5.5-5.3s5.5 2 5.5 5.3"/></svg></div>
       <div class="klabel">Profesionales activos</div>
-      <div class="kval" id="kpiProfs">—</div>
+      <div class="kval skeleton" id="kpiProfs" data-raw-val="0">00</div>
       <div class="ksub">Con producción</div>
     </div>
     <div class="kpi k3">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="13" rx="1"/><line x1="9" y1="6.5" x2="9" y2="10.5"/><line x1="7" y1="8.5" x2="11" y2="8.5"/><line x1="4" y1="16" x2="14" y2="16"/></svg></div>
       <div class="klabel">Establecimientos</div>
-      <div class="kval" id="kpiEESS">—</div>
+      <div class="kval skeleton" id="kpiEESS" data-raw-val="0">00</div>
       <div class="ksub">Con producción</div>
     </div>
     <div class="kpi k4">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="15" x2="3" y2="9"/><line x1="9" y1="15" x2="9" y2="5"/><line x1="15" y1="15" x2="15" y2="11"/></svg></div>
       <div class="klabel">Promedio diario</div>
-      <div class="kval" id="kpiProm">—</div>
+      <div class="kval skeleton" id="kpiProm" data-raw-val="0">00</div>
       <div class="ksub">Registros / día</div>
     </div>
   </div>
 
   <div class="kpis no-print" id="kpiCards2">
     <div class="kpi k5">
-      <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.3l6 2v4.4c0 4-2.6 6.6-6 7.7-3.4-1.1-6-3.7-6-7.7V4.3l6-2z"/><path d="M6.3 9l1.7 1.7 3.5-3.7"/></svg></div>
+      <svg class="kpi-ring" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="16" fill="none" stroke="#E4E1D6" stroke-width="4"/>
+        <circle id="kpiCumplRing" cx="20" cy="20" r="16" fill="none" stroke="#0E9F6E" stroke-width="4"
+          stroke-linecap="round" stroke-dasharray="100.53" stroke-dashoffset="100.53" transform="rotate(-90 20 20)"/>
+      </svg>
       <div class="klabel">Cumplimiento promedio</div>
-      <div class="kval" id="kpiCumplimiento">—</div>
+      <div class="kval skeleton" id="kpiCumplimiento" data-raw-val="0">00</div>
       <div class="ksub">Vs. estándar FUAS/día por profesión</div>
     </div>
     <div class="kpi k6">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.8l7.2 12.4H1.8L9 2.8z"/><line x1="9" y1="7.3" x2="9" y2="10.8"/><circle cx="9" cy="12.8" r="0.15" fill="currentColor"/></svg></div>
       <div class="klabel">Alertas de sobreproducción</div>
-      <div class="kval" id="kpiAlertas">—</div>
+      <div class="kval skeleton" id="kpiAlertas" data-raw-val="0">00</div>
       <div class="ksub">Días con FUAS &gt; estándar</div>
     </div>
     <div class="kpi k7">
       <div class="kicon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,13 7,8 10,11 16,4"/><polyline points="11,4 16,4 16,9"/></svg></div>
       <div class="klabel">Tendencia vs. mes anterior</div>
-      <div class="kval" id="kpiTendencia">—</div>
+      <div class="kval skeleton" id="kpiTendencia" data-raw-val="0">00</div>
       <div class="ksub" id="kpiTendenciaSub">Total de registros</div>
     </div>
   </div>
@@ -664,7 +705,12 @@
     <div class="muted" style="margin-top:6px">
       Estándar de referencia (FUAS máx./día por profesión): Médico 60 · Odontólogo 50 · Enfermera 50 · Obstetra/Obstetriz 50 ·
       Técnico de Enfermería 50 · Nutricionista 40 · Psicólogo 24 · Trabajadora Social 40.
-        </div>
+      <b>Nota:</b> Enfermera y Obstetra/Obstetriz tenían dos valores (50 y 40) en la tabla original; se unificaron en <b>50</b>.
+      Si corresponde el valor de 40, cámbialo en <code>ESTANDARES_FUA</code> dentro del código (una sola línea por profesión).
+      La comparación reconoce variantes de redacción (Obstetriz, Enfermera(a), Técnico en Enfermería, Cirujano Dentista, etc.)
+      buscando palabra clave, no el texto exacto — si alguna profesión sigue mostrando "Sin estándar", revisa <code>REGLAS_TIPO</code>.
+    </div>
+  </div>
 
   <!-- MATRIZ EESS -->
   <div class="card" id="cardEESS" style="display:none">
@@ -707,6 +753,37 @@ if(window.Chart){
   Chart.defaults.font.family = "'IBM Plex Sans','Segoe UI',sans-serif";
   Chart.defaults.color = "#5B6472";
 }
+
+/* Plugin propio (sin librería externa) para mostrar el valor sobre cada barra —
+   así se lee el número exacto sin pasar el mouse, útil también en capturas. */
+const valueLabelPlugin = {
+  id:"valueLabels",
+  afterDatasetsDraw(chart){
+    const {ctx} = chart;
+    const horizontal = chart.options.indexAxis==="y";
+    ctx.save();
+    ctx.font = "600 10px 'IBM Plex Mono', monospace";
+    ctx.fillStyle = "#33404E";
+    ctx.textBaseline = "middle";
+    chart.data.datasets.forEach((dataset,dsIndex)=>{
+      const meta = chart.getDatasetMeta(dsIndex);
+      if(meta.hidden) return;
+      meta.data.forEach((bar,i)=>{
+        const val = dataset.data[i];
+        if(val===0 || val==null) return;
+        const label = Number(val).toLocaleString();
+        if(horizontal){
+          ctx.textAlign="left";
+          ctx.fillText(label, bar.x+6, bar.y);
+        } else {
+          ctx.textAlign="center";
+          ctx.fillText(label, bar.x, bar.y-8);
+        }
+      });
+    });
+    ctx.restore();
+  }
+};
 
 /* ══════════════════════════════════════════
    ESTÁNDARES DE PRODUCCIÓN (FUAS máx./día/persona)
@@ -941,6 +1018,7 @@ async function cargarMes(){
   const anio=$("anio").value, mes=$("mes").value;
   const file=`data/base_${anio}_${String(mes).padStart(2,"0")}.json`;
   $("estado").textContent=`Cargando ${anio}-${String(mes).padStart(2,"0")}…`;
+  mostrarEsqueletoKPIs();
   const r=await fetch(file+"?ts="+Date.now());
   BASE=await r.json();
   for(const x of BASE) x.dni_prof=canonDNI(x.dni_prof);
@@ -1000,10 +1078,11 @@ function renderAnual(){
       backgroundColor: data.map((_,i)=>`rgba(15,42,92,${0.55+0.45*(i/11)})`),
       borderRadius:5, borderSkipped:false
     }]},
-    options:{ responsive:true, maintainAspectRatio:false,
+    options:{ responsive:true, maintainAspectRatio:false, layout:{padding:{top:14}},
       plugins:{ legend:{display:false} },
       scales:{ x:{grid:{display:false}}, y:{grid:{color:"#EDEAE0"}} }
-    }
+    },
+    plugins:[valueLabelPlugin]
   });
 }
 
@@ -1040,10 +1119,11 @@ function renderTotalesPorAnios(){
       backgroundColor:["#0891A8","#0F2A5C","#6D4FC2","#0E9F6E"].slice(0,years.length),
       borderRadius:6, borderSkipped:false
     }]},
-    options:{ responsive:true, maintainAspectRatio:false,
+    options:{ responsive:true, maintainAspectRatio:false, layout:{padding:{top:14}},
       plugins:{ legend:{display:false} },
       scales:{ x:{grid:{display:false}}, y:{grid:{color:"#EDEAE0"}} }
-    }
+    },
+    plugins:[valueLabelPlugin]
   });
 }
 
@@ -1113,6 +1193,7 @@ function calcularTendenciaGlobal(dFiltradoActual){
 ══════════════════════════════════════════ */
 function render(){
   if(!BASE.length) return;
+  ocultarEsqueletoKPIs();
   $("printSub").textContent=filtrosTexto();
   $("printFechas").textContent=$("fechaActualizacion").textContent+" | "+$("fechaDigitacion").textContent;
   actualizarBannerFiltro();
@@ -1171,30 +1252,81 @@ function actualizarBannerFiltro(){
   `;
 }
 
+/* ── Números animados (count-up), respeta "reducir movimiento" ── */
+function animateNumber(el, endVal, opts={}){
+  const {duration=650, prefix="", suffix=""} = opts;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const startVal = Number(el.dataset.rawVal||0);
+  el.dataset.rawVal = endVal;
+  if(reduce || !isFinite(startVal) || startVal===endVal){
+    el.textContent = `${prefix}${Math.round(endVal).toLocaleString()}${suffix}`;
+    return;
+  }
+  const t0 = performance.now();
+  function tick(now){
+    const p = Math.min(1, (now-t0)/duration);
+    const eased = 1-Math.pow(1-p,3);
+    const current = Math.round(startVal + (endVal-startVal)*eased);
+    el.textContent = `${prefix}${current.toLocaleString()}${suffix}`;
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ── Esqueleto de carga (mientras se descarga el mes) ── */
+const KPI_IDS = ["kpiTotal","kpiProfs","kpiEESS","kpiProm","kpiCumplimiento","kpiAlertas","kpiTendencia"];
+function mostrarEsqueletoKPIs(){
+  KPI_IDS.forEach(id=>$(id).classList.add("skeleton"));
+}
+function ocultarEsqueletoKPIs(){
+  KPI_IDS.forEach(id=>$(id).classList.remove("skeleton"));
+}
+
+/* ── Anillo de progreso de la tarjeta Cumplimiento ── */
+const RING_CIRC = 2*Math.PI*16; // ≈ 100.53, radio del <circle r="16">
+function actualizarAnilloCumplimiento(pct){
+  const ring = $("kpiCumplRing");
+  if(!ring) return;
+  if(pct==null){
+    ring.style.strokeDashoffset = RING_CIRC;
+    ring.style.stroke = "#CBD5C9";
+    return;
+  }
+  const clamped = Math.max(0, Math.min(100, pct));
+  ring.style.strokeDashoffset = RING_CIRC*(1-clamped/100);
+  ring.style.stroke = pct>UMBRAL_ALTO ? "#DC2626" : (pct>=UMBRAL_BAJO ? "#0E9F6E" : "#D97706");
+}
+
 /* ── KPIs dinámicos ── */
 function actualizarKPIs(d, nDias){
-  $("kpiTotal").textContent  = d.length.toLocaleString();
-  $("kpiProfs").textContent  = new Set(d.map(x=>x.profesional).filter(Boolean)).size.toLocaleString();
-  $("kpiEESS").textContent   = new Set(d.map(x=>x.establecimiento).filter(Boolean)).size.toLocaleString();
+  animateNumber($("kpiTotal"), d.length);
+  animateNumber($("kpiProfs"), new Set(d.map(x=>x.profesional).filter(Boolean)).size);
+  animateNumber($("kpiEESS"), new Set(d.map(x=>x.establecimiento).filter(Boolean)).size);
   const prom = nDias>0 ? Math.round(d.length/nDias) : 0;
-  $("kpiProm").textContent   = prom.toLocaleString();
+  animateNumber($("kpiProm"), prom);
 }
 
 /* ── KPIs de cumplimiento / alertas / tendencia ── */
 function actualizarKPIsCumplimiento(stats, dFiltrado){
-  $("kpiCumplimiento").textContent = stats.cumplPromedio!=null ? stats.cumplPromedio+"%" : "—";
-  $("kpiAlertas").textContent = stats.alertas.toLocaleString();
+  if(stats.cumplPromedio!=null){
+    animateNumber($("kpiCumplimiento"), stats.cumplPromedio, {suffix:"%"});
+  } else {
+    $("kpiCumplimiento").textContent="—"; $("kpiCumplimiento").dataset.rawVal=0;
+  }
+  actualizarAnilloCumplimiento(stats.cumplPromedio);
+
+  animateNumber($("kpiAlertas"), stats.alertas);
 
   const tend = calcularTendenciaGlobal(dFiltrado);
   const elVal = $("kpiTendencia"), elSub=$("kpiTendenciaSub");
   if(!tend){
-    elVal.textContent="—"; elVal.style.color="";
+    elVal.textContent="—"; elVal.style.color=""; elVal.dataset.rawVal=0;
     elSub.textContent="Sin datos del mes anterior";
   } else {
     const signo = tend.delta>0?"▲":(tend.delta<0?"▼":"▬");
     const color = tend.delta>0?"#059669":(tend.delta<0?"#dc2626":"#94a3b8");
-    elVal.textContent = `${signo} ${Math.abs(tend.pct)}%`;
     elVal.style.color = color;
+    animateNumber(elVal, Math.abs(tend.pct), {prefix:`${signo} `, suffix:"%"});
     elSub.textContent = `${dFiltrado.length.toLocaleString()} vs ${tend.prevTotal.toLocaleString()} (mes anterior)`;
   }
 }
@@ -1256,8 +1388,8 @@ function renderMatrizPersonal(d, nDias){
   let totalAlertas=0, sumCumpl=0, nCumpl=0;
 
   let html=`<thead><tr>
-    <th class="left">ESTABLECIMIENTO</th>
-    <th class="left">PERSONAL (CONFIDENCIAL)</th>
+    <th class="left sticky-col th-eess" style="--sticky-left:0">ESTABLECIMIENTO</th>
+    <th class="left sticky-col th-prof sticky-last" style="--sticky-left:150px">PERSONAL (CONFIDENCIAL)</th>
     <th class="left">PROFESIÓN</th>
     ${days.map(x=>`<th class="th-day">${x}</th>`).join("")}
     <th class="th-total">TOTAL</th>
@@ -1310,8 +1442,8 @@ function renderMatrizPersonal(d, nDias){
     }
 
     html+=`<tr>
-      <td class="td-eess">${esc(r.establecimiento)}</td>
-      <td class="td-prof">${esc(labelConfidencial(r.profesional))}</td>
+      <td class="td-eess sticky-col" style="--sticky-left:0">${esc(r.establecimiento)}</td>
+      <td class="td-prof sticky-col sticky-last" style="--sticky-left:150px">${esc(labelConfidencial(r.profesional))}</td>
       <td class="td-prof-tipo">${esc(r.profesion)}</td>
       ${celdas}
       <td class="td-total">${r.total}</td>
@@ -1345,7 +1477,7 @@ function renderMatrizEESS(d,nDias){
     if(dia>=1&&dia<=nDias){ obj.dd[dia]+=1; obj.total+=1; }
   }
   const rows=[...map.entries()].map(([k,v])=>({k,...v})).sort((a,b)=>b.total-a.total);
-  let html=`<thead><tr><th class="left">EESS</th>${days.map(x=>`<th class="th-day">${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
+  let html=`<thead><tr><th class="left sticky-col th-eess" style="--sticky-left:0">EESS</th>${days.map(x=>`<th class="th-day">${x}</th>`).join("")}<th class="th-total">TOTAL</th></tr></thead><tbody>`;
   if(rows.length===0){
     html += `<tr><td colspan="${2+days.length}" style="padding:26px 10px;text-align:center">
       <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted)">
@@ -1356,7 +1488,7 @@ function renderMatrizEESS(d,nDias){
   }
   for(const r of rows){
     html+=`<tr>
-      <td class="td-eess">${esc(r.k)}</td>
+      <td class="td-eess sticky-col sticky-last" style="--sticky-left:0">${esc(r.k)}</td>
       ${days.map(dy=>`<td class="td-num">${r.dd[dy]||""}</td>`).join("")}
       <td class="td-total">${r.total}</td>
     </tr>`;
@@ -1398,10 +1530,11 @@ function renderCharts(d){
       }),
       borderRadius:5, borderSkipped:false
     }]},
-    options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false,
+    options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false, layout:{padding:{right:34}},
       plugins:{ legend:{display:false} },
       scales:{ x:{grid:{color:"#EDEAE0"}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
-    }
+    },
+    plugins:[valueLabelPlugin]
   });
 
   chartTipo=new Chart($("c_tipo"),{
