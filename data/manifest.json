@@ -169,12 +169,17 @@
       "anio": 2026,
       "mes": 7,
       "file": "base_2026_07.json"
+    },
+    {
+      "anio": 2026,
+      "mes": 8,
+      "file": "base_2026_08.json"
     }
   ],
   "ultimo": {
     "anio": 2026,
-    "mes": 7
+    "mes": 8
   },
-  "generado": "2026-07-31 15:39:30",
+  "generado": "2026-08-04 17:01:28",
   "origen": "D:\\BASE DE DATOS"
 }
